@@ -5,7 +5,7 @@ navbar:
     - text: "Home"
       href: index.html
     - text: "Full code"
-      href: Journal.html
+      href: Fullcode.html
     - text: "Graphs"
       href: Links.html
 output_dir: "docs"
