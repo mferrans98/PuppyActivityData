@@ -1,6 +1,6 @@
-name: "MyLabJournal"
+name: "Puppy Activity Data"
 navbar:
-  title: "MyLabJournal"
+  title: "Puppy Activity Data"
   left:
     - text: "Home"
       href: index.html
