@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>code.knit</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Puppy Activity Data</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Fullcode.html">Full code</a>
+</li>
+<li>
+  <a href="Links.html">Graphs</a>
+</li>
+<li>
+  <a href="code.html">Code</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+
+</div>
+
+
+<p>ACTIVITY MONITOR DATA (Updated 20211026)</p>
+<pre class="r"><code>knitr::opts_chunk$set(echo = FALSE)</code></pre>
+<div id="data-setup" class="section level2">
+<h2>#DATA SETUP</h2>
+<p>Load packages and import data</p>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.4     ✓ dplyr   1.0.7
+## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
+## ✓ readr   2.0.1     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:clock&#39;:
+## 
+##     as_date</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
+<pre><code>## 
+## Attaching package: &#39;hms&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:lubridate&#39;:
+## 
+##     hms</code></pre>
+<p>Removing dates where collar is off</p>
+<p>Rename columns</p>
+<p>Delete sleeping hours (10pm-8am)</p>
+<p>Adding DOB, weeks old, rearing (home vs DPK), &amp; sex columns</p>
+<p>Make hour column</p>
+<p>Make combined column for date and time</p>
+<p>Create 5 minute intervals labels</p>
+<p>For each puppy, find an average of activity for each 5 minute interval (make one mean activity count for each interval)</p>
+<pre><code>## `summarise()` has grouped output by &#39;intervaltime&#39;, &#39;weeksold&#39;, &#39;name&#39;, &#39;rearing&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;intervaltime&#39;, &#39;Date&#39;, &#39;weeksold&#39;, &#39;name&#39;, &#39;rearing&#39;. You can override using the `.groups` argument.</code></pre>
+<p>Deviance from weekly means (for each puppy) for each (5 min interval) data point (creates indiv_weekly_dev df)</p>
+<pre><code>## `summarise()` has grouped output by &#39;name&#39;. You can override using the `.groups` argument.</code></pre>
+<p>Find an average of activity for each week for each 5 minute interval (make one mean activity count for each interval) (not by puppy, for the entire group)</p>
+<pre><code>## `summarise()` has grouped output by &#39;intervaltime&#39;. You can override using the `.groups` argument.</code></pre>
+<table style="width:6%;">
+<colgroup>
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>#PLOTTING ACTIVITY Setup</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Store weeks old as a factor</td>
+</tr>
+<tr class="even">
+<td>List of desired hourly time breaks for graph x axis tick marks</td>
+</tr>
+<tr class="odd">
+<td>#MEAN DEVIANCE GRAPHS</td>
+</tr>
+</tbody>
+</table>
+<p>INDIVIDUAL GRAPHS FOR 1 INDIVIDUAL PUPPY FOR 1 INDIVIDUAL WEEK <img src="code_files/figure-html/unnamed-chunk-15-1.png" width="672" /> GRAPH OF MEAN DEVIANCE (GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK <img src="code_files/figure-html/unnamed-chunk-16-1.png" width="672" /> COMPARE TWO PUPPIES’ MEAN DEVIANCE FOR 1 SPECIFIC WEEK <img src="code_files/figure-html/unnamed-chunk-17-1.png" width="672" /> GROUP AVG FOR 1 INDIVIDUAL WEEK <img src="code_files/figure-html/unnamed-chunk-18-1.png" width="672" /> GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP MEAN DEVIANCE) <img src="code_files/figure-html/unnamed-chunk-19-1.png" width="672" /> GRAPHS OF ALL WEEKS FOR 1 INDIVIDUAL PUPPY <img src="code_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>GRAPHS OF GROUP DEVIANCE: 8 VS 20 WEEKS <img src="code_files/figure-html/unnamed-chunk-21-1.png" width="672" /> GRAPHS OF GROUP DEVIANCE: 8, 14, &amp; 20 WEEKS <img src="code_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+</div>
+<div id="mean-activity-count-graphs-raw-mean-activity-not-deviance" class="section level2">
+<h2>#MEAN ACTIVITY COUNT GRAPHS (raw mean activity, not deviance)</h2>
+<p>INDIVIDUAL GRAPH OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL PUPPY FOR 1 INDIVIDUAL WEEK <img src="code_files/figure-html/unnamed-chunk-23-1.png" width="672" /> GRAPH OF RAW (MEAN) ACTIVITY COUNTS GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK <img src="code_files/figure-html/unnamed-chunk-24-1.png" width="672" /><img src="code_files/figure-html/unnamed-chunk-24-2.png" width="672" /> COMPARE TWO PUPPIES’ RAW MEAN ACTIVITY COUNTS FOR 1 SPECIFIC WEEK <img src="code_files/figure-html/unnamed-chunk-25-1.png" width="672" /> GROUP AVG OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL WEEK <img src="code_files/figure-html/unnamed-chunk-26-1.png" width="672" /><img src="code_files/figure-html/unnamed-chunk-26-2.png" width="672" /> GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP RAW MEAN ACTIVITY COUNTS) <img src="code_files/figure-html/unnamed-chunk-27-1.png" width="672" /> GRAPHS OF GROUP: 8 VS 20 WEEKS (RAW MEAN ACTIVITY COUNTS) <img src="code_files/figure-html/unnamed-chunk-28-1.png" width="672" /> GRAPHS OF GROUP: 8, 14, &amp; 20 WEEKS <img src="code_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<table style="width:6%;">
+<colgroup>
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>#CALCULATE SLEEP BOUTS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Rest/wake thresholds</td>
+</tr>
+<tr class="even">
+<td>Intervals of resting and wakefulness</td>
+</tr>
+<tr class="odd">
+<td><code>## Note: method with signature 'Period#ANY' chosen for function '-', ##  target signature 'Period#Period'. ##  "ANY#Period" would also be valid</code></td>
+</tr>
+<tr class="even">
+<td><code>## `summarise()` has grouped output by 'name', 'weeksold'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="odd">
+<td><code>## `summarise()` has grouped output by 'weeksold'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="even">
+<td>Calculate rest/wake duration (avg and total) for each puppy for each week, add rearing &amp; sex info</td>
+</tr>
+<tr class="odd">
+<td><code>## `summarise()` has grouped output by 'weeksold', 'name'. You can override using the `.groups` argument.</code> Compare home vs. DPK pups</td>
+</tr>
+<tr class="even">
+<td><code>## `summarise()` has grouped output by 'weeksold', 'state'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="odd">
+<td>Without collapsing across days:</td>
+</tr>
+<tr class="even">
+<td><code>## `summarise()` has grouped output by 'name', 'Date', 'weeksold'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="odd">
+<td><code>## `summarise()` has grouped output by 'weeksold', 'name', 'intervaltime'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="even">
+<td><code>## `summarise()` has grouped output by 'weeksold', 'intervaltime'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="odd">
+<td><code>## `summarise()` has grouped output by 'weeksold'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="even">
+<td><code>## `summarise()` has grouped output by 'weeksold', 'name'. You can override using the `.groups` argument.</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="plotting-restwake-bouts" class="section level2">
+<h2>#PLOTTING REST/WAKE BOUTS</h2>
+<p>Compare average rest/wake bout durations in 1 individual week <img src="code_files/figure-html/unnamed-chunk-35-1.png" width="672" /> Compare average rest/awake bout durations for each week <img src="code_files/figure-html/unnamed-chunk-36-1.png" width="672" /><img src="code_files/figure-html/unnamed-chunk-36-2.png" width="672" /> Total Minutes of Rest by Week <img src="code_files/figure-html/unnamed-chunk-37-1.png" width="672" /> AVG REST HOME VS. DPK <img src="code_files/figure-html/unnamed-chunk-38-1.png" width="672" /><img src="code_files/figure-html/unnamed-chunk-38-2.png" width="672" /></p>
+</div>
+<div id="by-puppy" class="section level2">
+<h2>#BY PUPPY</h2>
+<p>Bar graph: Mean State Duration for 1 puppy by weeks <img src="code_files/figure-html/unnamed-chunk-39-1.png" width="672" /> Line graph: Mean State Duration for 1 puppy by weeks <img src="code_files/figure-html/unnamed-chunk-40-1.png" width="672" /> Line graph: mean rest state duration by week for each puppy <img src="code_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+</div>
+<div id="export" class="section level2">
+<h2>#EXPORT</h2>
+<p>EXPORT dfs individually</p>
+<p>EXPORT dfs as sheets on one doc</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
