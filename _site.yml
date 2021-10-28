@@ -8,4 +8,6 @@ navbar:
       href: Fullcode.html
     - text: "Graphs"
       href: Links.html
+    - text: "Code"
+      href: code.html
 output_dir: "docs"
