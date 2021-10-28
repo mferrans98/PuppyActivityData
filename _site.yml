@@ -4,10 +4,10 @@ navbar:
   left:
     - text: "Home"
       href: index.html
-    - text: "Full code"
-      href: Fullcode.html
-    - text: "Graphs"
-      href: Links.html
-    - text: "Code"
+    - text: "Full Code"
       href: code.html
+    - text: "Activity Graphs"
+      href: activitygraphs.html
+    - text: "Activity Graphs"
+      href: sleepgraphs.html
 output_dir: "docs"
