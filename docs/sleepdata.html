@@ -252,6 +252,9 @@ $(document).ready(function () {
 <li>
   <a href="activitygraphs.html">Activity Graphs</a>
 </li>
+<li>
+  <a href="sleepdata.html">Sleep</a>
+</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         
@@ -279,27 +282,30 @@ load(file = &quot;activitygraphsenv.RData&quot;)</code></pre>
 <pre class="r"><code>head(sleepbouts)</code></pre>
 <pre><code>## # A tibble: 6 × 14
 ## # Groups:   name, weeksold [6]
-##   name  weeksold intervaltime rearing sex   interval_avg_acti… weeklymeanforage…     N meandeviance state
-##   &lt;chr&gt; &lt;fct&gt;    &lt;chr&gt;        &lt;chr&gt;   &lt;chr&gt;              &lt;dbl&gt;             &lt;dbl&gt; &lt;int&gt;        &lt;dbl&gt; &lt;chr&gt;
-## 1 Anya  13       08:00        DPK     F                   832               311.   180       521.   awake
-## 2 Anya  14       08:00        DPK     F                   865.              350.   180       515.   awake
-## 3 Anya  15       08:00        DPK     F                   650.              271.   180       380.   awake
-## 4 Anya  16       08:00        DPK     F                   468.              311.   180       157.   awake
-## 5 Anya  17       08:00        DPK     F                   587.              296.   180       290.   awake
-## 6 Anya  18       08:00        DPK     F                   347.              357.   180        -9.08 awake
-## # … with 4 more variables: intervalend &lt;chr&gt;, timeperiod &lt;Period&gt;, timeperiod_end &lt;Period&gt;, group &lt;int&gt;</code></pre>
+##   name  weeksold intervaltime rearing sex   interval_avg_acti… weeklymeanforage…
+##   &lt;chr&gt; &lt;fct&gt;    &lt;chr&gt;        &lt;chr&gt;   &lt;chr&gt;              &lt;dbl&gt;             &lt;dbl&gt;
+## 1 Anya  13       08:00        DPK     F                   832               311.
+## 2 Anya  14       08:00        DPK     F                   865.              350.
+## 3 Anya  15       08:00        DPK     F                   650.              271.
+## 4 Anya  16       08:00        DPK     F                   468.              311.
+## 5 Anya  17       08:00        DPK     F                   587.              296.
+## 6 Anya  18       08:00        DPK     F                   347.              357.
+## # … with 7 more variables: N &lt;int&gt;, meandeviance &lt;dbl&gt;, state &lt;chr&gt;,
+## #   intervalend &lt;chr&gt;, timeperiod &lt;Period&gt;, timeperiod_end &lt;Period&gt;,
+## #   group &lt;int&gt;</code></pre>
 <pre class="r"><code>head(sleepbouts2)</code></pre>
 <pre><code>## # A tibble: 6 × 12
 ## # Groups:   name, weeksold [1]
-##   intervaltime Date       weeksold name  rearing sex   interval_avg_activity state intervalend timeperiod
-##   &lt;chr&gt;        &lt;date&gt;        &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;                 &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;       &lt;Period&gt;  
-## 1 08:00        2019-10-02       13 Anya  DPK     F                      572  awake 08:05       8H 0M 0S  
-## 2 08:05        2019-10-02       13 Anya  DPK     F                      761. awake 08:10       8H 5M 0S  
-## 3 08:10        2019-10-02       13 Anya  DPK     F                     1093. awake 08:15       8H 10M 0S 
-## 4 08:15        2019-10-02       13 Anya  DPK     F                      100. awake 08:20       8H 15M 0S 
-## 5 08:20        2019-10-02       13 Anya  DPK     F                        0  rest  08:25       8H 20M 0S 
-## 6 08:25        2019-10-02       13 Anya  DPK     F                        0  rest  08:30       8H 25M 0S 
-## # … with 2 more variables: timeperiod_end &lt;Period&gt;, group &lt;int&gt;</code></pre>
+##   intervaltime Date       weeksold name  rearing sex   interval_avg_activ… state
+##   &lt;chr&gt;        &lt;date&gt;        &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;               &lt;dbl&gt; &lt;chr&gt;
+## 1 08:00        2019-10-02       13 Anya  DPK     F                    572  awake
+## 2 08:05        2019-10-02       13 Anya  DPK     F                    761. awake
+## 3 08:10        2019-10-02       13 Anya  DPK     F                   1093. awake
+## 4 08:15        2019-10-02       13 Anya  DPK     F                    100. awake
+## 5 08:20        2019-10-02       13 Anya  DPK     F                      0  rest 
+## 6 08:25        2019-10-02       13 Anya  DPK     F                      0  rest 
+## # … with 4 more variables: intervalend &lt;chr&gt;, timeperiod &lt;Period&gt;,
+## #   timeperiod_end &lt;Period&gt;, group &lt;int&gt;</code></pre>
 <table>
 <tbody>
 <tr class="odd">
@@ -309,28 +315,28 @@ load(file = &quot;activitygraphsenv.RData&quot;)</code></pre>
 </table>
 <p>Compare average rest/wake bout durations in 1 individual week</p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,weeksold==&quot;20&quot;), aes(x=state, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle(&quot;Average Sleep/Awake Bout Duration: 20 weeks&quot;) + xlab(&quot;State&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;State&quot;)</code></pre>
-<p><img src="sleepdata_files/figure-html/unnamed-chunk-63-1.png" width="672" /> Compare average rest/awake bout durations for each week</p>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-3-1.png" width="672" /> Compare average rest/awake bout durations for each week</p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;awake&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Avg Duration of Awake Bouts by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
-<p><img src="sleepdata_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Avg Duration of Rest Bouts by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
-<p><img src="sleepdata_files/figure-html/unnamed-chunk-64-2.png" width="672" /> Total Minutes of Rest by Week</p>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-4-2.png" width="672" /> Total Minutes of Rest by Week</p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;rest&quot;), aes(x=weeksold, y=Total_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Average Total Rest by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Total Rest (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
-<p><img src="sleepdata_files/figure-html/unnamed-chunk-65-1.png" width="672" /> AVG REST HOME VS. DPK</p>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-5-1.png" width="672" /> AVG REST HOME VS. DPK</p>
 <pre class="r"><code>weeks&lt;-c(8:20)
 
 ggplot(subset(sleepbout_weeklyavg_rearing,state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle(&quot;Avg Duration of Rest Bouts by Week: Home vs. DPK&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Avg State Duration (min)&quot;) + labs(colour = &quot;Rearing&quot;) + scale_x_continuous(breaks=weeks)</code></pre>
-<p><img src="sleepdata_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_rearing,state==&quot;rest&quot;), aes(x=weeksold, y=Total_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle(&quot;Average Total Rest by Week: Home vs. DPK&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Rest (mins)&quot;) + labs(colour = &quot;Rearing&quot;) + scale_x_continuous(breaks=weeks)</code></pre>
-<p><img src="sleepdata_files/figure-html/unnamed-chunk-66-2.png" width="672" /></p>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
 <div id="by-puppy" class="section level2">
 <h2>#BY PUPPY</h2>
 <p>Bar graph: Mean State Duration for 1 puppy by weeks</p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, name==&quot;Leo&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle(&quot;Leo: Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
-<p><img src="sleepdata_files/figure-html/unnamed-chunk-67-1.png" width="672" /> Line graph: Mean State Duration for 1 puppy by weeks</p>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-7-1.png" width="672" /> Line graph: Mean State Duration for 1 puppy by weeks</p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, name==&quot;Leo&quot;), aes(x=weeksold, y=Mean_mins, group=state))+ geom_line(aes(colour=state)) + ggtitle(&quot;Leo: Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
-<p><img src="sleepdata_files/figure-html/unnamed-chunk-68-1.png" width="672" /> Line graph: mean rest state duration by week for each puppy</p>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-8-1.png" width="672" /> Line graph: mean rest state duration by week for each puppy</p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins, group=name))+ geom_line(aes(colour=name)) + ggtitle(&quot;Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
-<p><img src="sleepdata_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>
 </div>
 
