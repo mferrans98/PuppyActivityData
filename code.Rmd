@@ -4,7 +4,8 @@ output:
 ---
 ACTIVITY MONITOR DATA (Updated 20211026)
 ```{r}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, 
+                      eval = FALSE)
 ```
  
 #DATA SETUP
