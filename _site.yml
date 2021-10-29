@@ -8,6 +8,6 @@ navbar:
       href: code.html
     - text: "Activity Graphs"
       href: activitygraphs.html
-    - text: "Sleep Data"
+    - text: "SleepData"
       href: sleepdata.html
 output_dir: "docs"
