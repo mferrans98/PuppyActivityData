@@ -1,5 +1,5 @@
 ---
-title: "Sleep Graphs"
+title: "Sleep Data"
 author: "Morgan Ferrans"
 date: "10/28/2021"
 output: html_document

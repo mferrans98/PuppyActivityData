@@ -13,7 +13,7 @@
 
 <meta name="date" content="2021-10-28" />
 
-<title>Sleep Graphs</title>
+<title>Sleep Data</title>
 
 <script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -267,7 +267,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Sleep Graphs</h1>
+<h1 class="title toc-ignore">Sleep Data</h1>
 <h4 class="author">Morgan Ferrans</h4>
 <h4 class="date">10/28/2021</h4>
 
@@ -279,8 +279,33 @@ library(tidyverse)
 load(file = &quot;activitygraphsenv.RData&quot;)</code></pre>
 <div id="data-frames" class="section level1">
 <h1>DATA FRAMES</h1>
-<pre class="r"><code>view(sleepbouts)
-view(sleepbouts2)</code></pre>
+<pre class="r"><code>head(sleepbouts)</code></pre>
+<pre><code>## # A tibble: 6 × 14
+## # Groups:   name, weeksold [6]
+##   name  weeksold intervaltime rearing sex   interval_avg_acti… weeklymeanforage…
+##   &lt;chr&gt; &lt;fct&gt;    &lt;chr&gt;        &lt;chr&gt;   &lt;chr&gt;              &lt;dbl&gt;             &lt;dbl&gt;
+## 1 Anya  13       08:00        DPK     F                   832               311.
+## 2 Anya  14       08:00        DPK     F                   865.              350.
+## 3 Anya  15       08:00        DPK     F                   650.              271.
+## 4 Anya  16       08:00        DPK     F                   468.              311.
+## 5 Anya  17       08:00        DPK     F                   587.              296.
+## 6 Anya  18       08:00        DPK     F                   347.              357.
+## # … with 7 more variables: N &lt;int&gt;, meandeviance &lt;dbl&gt;, state &lt;chr&gt;,
+## #   intervalend &lt;chr&gt;, timeperiod &lt;Period&gt;, timeperiod_end &lt;Period&gt;,
+## #   group &lt;int&gt;</code></pre>
+<pre class="r"><code>head(sleepbouts2)</code></pre>
+<pre><code>## # A tibble: 6 × 12
+## # Groups:   name, weeksold [1]
+##   intervaltime Date       weeksold name  rearing sex   interval_avg_activ… state
+##   &lt;chr&gt;        &lt;date&gt;        &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;               &lt;dbl&gt; &lt;chr&gt;
+## 1 08:00        2019-10-02       13 Anya  DPK     F                    572  awake
+## 2 08:05        2019-10-02       13 Anya  DPK     F                    761. awake
+## 3 08:10        2019-10-02       13 Anya  DPK     F                   1093. awake
+## 4 08:15        2019-10-02       13 Anya  DPK     F                    100. awake
+## 5 08:20        2019-10-02       13 Anya  DPK     F                      0  rest 
+## 6 08:25        2019-10-02       13 Anya  DPK     F                      0  rest 
+## # … with 4 more variables: intervalend &lt;chr&gt;, timeperiod &lt;Period&gt;,
+## #   timeperiod_end &lt;Period&gt;, group &lt;int&gt;</code></pre>
 <table>
 <tbody>
 <tr class="odd">
