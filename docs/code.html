@@ -245,13 +245,13 @@ $(document).ready(function () {
   <a href="index.html">Home</a>
 </li>
 <li>
-  <a href="Fullcode.html">Full code</a>
+  <a href="code.html">Full Code</a>
 </li>
 <li>
-  <a href="Links.html">Graphs</a>
+  <a href="activitygraphs.html">Activity Graphs</a>
 </li>
 <li>
-  <a href="code.html">Code</a>
+  <a href="sleepgraphs.html">Sleep Graphs</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -270,10 +270,12 @@ $(document).ready(function () {
 
 
 <p>ACTIVITY MONITOR DATA (Updated 20211026)</p>
-<pre class="r"><code>knitr::opts_chunk$set(echo = FALSE)</code></pre>
+<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE)</code></pre>
 <div id="data-setup" class="section level2">
 <h2>#DATA SETUP</h2>
 <p>Load packages and import data</p>
+<pre class="r"><code>library(readxl)    
+library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
 <pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
 ## ✓ tibble  3.1.4     ✓ dplyr   1.0.7
@@ -282,6 +284,9 @@ $(document).ready(function () {
 <pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(dplyr)
+library(clock)
+library(lubridate)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;lubridate&#39;</code></pre>
 <pre><code>## The following object is masked from &#39;package:clock&#39;:
@@ -290,24 +295,221 @@ $(document).ready(function () {
 <pre><code>## The following objects are masked from &#39;package:base&#39;:
 ## 
 ##     date, intersect, setdiff, union</code></pre>
+<pre class="r"><code>library(hms)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;hms&#39;</code></pre>
 <pre><code>## The following object is masked from &#39;package:lubridate&#39;:
 ## 
 ##     hms</code></pre>
+<pre class="r"><code>setwd(&#39;~/Desktop&#39;)
+
+
+##IMPORT the data
+sheets &lt;- readxl::excel_sheets(&#39;puppies2.xlsx&#39;)
+activity_df &lt;- do.call(rbind, lapply(sheets, function(X) transform(readxl::read_excel(&#39;puppies2.xlsx&#39;, sheet = X), sheetname = X)))
+activity_df&lt;-activity_df %&gt;% mutate(time=as_hms(activity_df$Time)) %&gt;% na.omit() %&gt;%  select(-sheetname,-Time)
+activity_df$Date &lt;- as.Date(activity_df$Date, format= &quot;%Y-%m-%d&quot;)</code></pre>
 <p>Removing dates where collar is off</p>
+<pre class="r"><code>#removing dates where collar is off
+  #Anya
+filtered_dates &lt;- activity_df[!(activity_df$Dog.name == &quot;Anya&quot; &amp; activity_df$Date &lt; &quot;2019-10-02&quot;)&amp;!(activity_df$Dog.name == &quot;Anya&quot; &amp; activity_df$Date == &quot;2019-10-16&quot;)&amp;!(activity_df$Dog.name == &quot;Anya&quot; &amp; activity_df$Date &gt; &quot;2020-11-18&quot;),]
+  #Aries
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Aries&quot; &amp; filtered_dates$Date &lt; &quot;2019-10-02&quot;)&amp;!(filtered_dates$Dog.name == &quot;Aries&quot; &amp; filtered_dates$Date == &quot;2019-10-16&quot;)&amp;!(filtered_dates$Dog.name == &quot;Aries&quot; &amp; filtered_dates$Date &gt; &quot;2020-11-18&quot;),]
+  #Weston
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Weston&quot; &amp; filtered_dates$Date &lt; &quot;2019-10-02&quot;)&amp;!(filtered_dates$Dog.name == &quot;Weston&quot; &amp; filtered_dates$Date == &quot;2019-10-16&quot;)&amp;!(filtered_dates$Dog.name == &quot;Weston&quot; &amp; filtered_dates$Date &gt; &quot;2020-11-18&quot;),]
+  #Ying
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Ying&quot; &amp; filtered_dates$Date &lt; &quot;2019-10-02&quot;)&amp;!(filtered_dates$Dog.name == &quot;Ying&quot; &amp; filtered_dates$Date == &quot;2019-10-16&quot;)&amp;!(filtered_dates$Dog.name == &quot;Ying&quot; &amp; filtered_dates$Date &gt; &quot;2020-11-18&quot;),]
+  #Yolanda
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Yolanda&quot; &amp; filtered_dates$Date &lt; &quot;2019-10-02&quot;)&amp;!(filtered_dates$Dog.name == &quot;Yolanda&quot; &amp; filtered_dates$Date == &quot;2019-10-16&quot;)&amp;!(filtered_dates$Dog.name == &quot;Yolanda&quot; &amp; filtered_dates$Date &gt; &quot;2019-11-18&quot;),]
+  #Zax
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Zax&quot; &amp; filtered_dates$Date &lt; &quot;2019-10-02&quot;)&amp;!(filtered_dates$Dog.name == &quot;Zax&quot; &amp; filtered_dates$Date == &quot;2019-10-16&quot;)&amp;!(filtered_dates$Dog.name == &quot;Zax&quot; &amp; filtered_dates$Date &gt; &quot;2019-11-18&quot;),]
+  #Zina
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Zina&quot; &amp; filtered_dates$Date &lt; &quot;2019-10-02&quot;)&amp;!(filtered_dates$Dog.name == &quot;Zina&quot; &amp; filtered_dates$Date == &quot;2019-10-16&quot;)&amp;!(filtered_dates$Dog.name == &quot;Zina&quot; &amp; filtered_dates$Date &gt; &quot;2019-11-18&quot;),]
+  #Arthur
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Arthur&quot; &amp; filtered_dates$Date &lt; &quot;2020-2-08&quot;)&amp;!(filtered_dates$Dog.name == &quot;Arthur&quot; &amp; filtered_dates$Date &gt; &quot;2020-03-10&quot;),]
+  #Aurora
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Aurora&quot; &amp; filtered_dates$Date &lt; &quot;2020-2-08&quot;)&amp;!(filtered_dates$Dog.name == &quot;Aurora&quot; &amp; filtered_dates$Date &gt; &quot;2020-03-10&quot;),]
+  #Westley
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Westley&quot; &amp; filtered_dates$Date &lt; &quot;2020-2-01&quot;)&amp;!(filtered_dates$Dog.name == &quot;Westley&quot; &amp; filtered_dates$Date &gt; &quot;2020-03-10&quot;),]
+  #Wisdom
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Wisdom&quot; &amp; filtered_dates$Date &lt; &quot;2020-2-01&quot;)&amp;!(filtered_dates$Dog.name == &quot;Wisdom&quot; &amp; filtered_dates$Date &gt; &quot;2020-03-10&quot;),]
+  #Yonder
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Yonder&quot; &amp; filtered_dates$Date &lt; &quot;2020-2-06&quot;)&amp;!(filtered_dates$Dog.name == &quot;Yonder&quot; &amp; filtered_dates$Date &gt; &quot;2020-03-10&quot;),]
+  #Zindel
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Zindel&quot; &amp; filtered_dates$Date &lt; &quot;2020-2-06&quot;)&amp;!(filtered_dates$Dog.name == &quot;Zindel&quot; &amp; filtered_dates$Date &gt; &quot;2020-03-10&quot;),]
+  #Zola
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Zola&quot; &amp; filtered_dates$Date &lt; &quot;2020-2-06&quot;)&amp;!(filtered_dates$Dog.name == &quot;Zola&quot; &amp; filtered_dates$Date &gt; &quot;2020-03-10&quot;),]
+  #Barley
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Barley&quot; &amp; filtered_dates$Date &lt; &quot;2020-8-06&quot;)&amp;!(filtered_dates$Dog.name == &quot;Barley&quot; &amp; filtered_dates$Date &gt; &quot;2020-09-30&quot;),]
+  #Kristoff
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Kristoff&quot; &amp; filtered_dates$Date &lt; &quot;2020-07-24&quot;)&amp;!(filtered_dates$Dog.name == &quot;Kristoff&quot; &amp; filtered_dates$Date &gt; &quot;2020-09-22&quot;),]
+  #Sparky
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Sparky&quot; &amp; filtered_dates$Date &lt; &quot;2020-10-08&quot;)&amp;!(filtered_dates$Dog.name == &quot;Sparky&quot; &amp; filtered_dates$Date &gt; &quot;2020-12-15&quot;),]
+  #Sassy
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Sassy&quot; &amp; filtered_dates$Date &lt; &quot;2020-10-08&quot;)&amp;!(filtered_dates$Dog.name == &quot;Sassy&quot; &amp; filtered_dates$Date &gt; &quot;2020-12-14&quot;),]
+  #Stanley
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Stanley&quot; &amp; filtered_dates$Date &lt; &quot;2020-10-08&quot;)&amp;!(filtered_dates$Dog.name == &quot;Stanley&quot; &amp; filtered_dates$Date &gt; &quot;2020-12-15&quot;),]
+  #Rainbow
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Rainbow&quot; &amp; filtered_dates$Date &lt; &quot;2020-10-08&quot;)&amp;!(filtered_dates$Dog.name == &quot;Rainbow&quot; &amp; filtered_dates$Date &gt; &quot;2020-12-07&quot;),]
+  #Jack
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Jack&quot; &amp; filtered_dates$Date &lt; &quot;2021-02-06&quot;)&amp;!(filtered_dates$Dog.name == &quot;Jack&quot; &amp; filtered_dates$Date &gt; &quot;2021-04-19&quot;),]
+  #Lily
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Lily&quot; &amp; filtered_dates$Date &lt; &quot;2021-2-06&quot;)&amp;!(filtered_dates$Dog.name == &quot;Lily&quot; &amp; filtered_dates$Date &gt; &quot;2021-04-20&quot;),]
+  #Leo
+filtered_dates &lt;- filtered_dates[!(filtered_dates$Dog.name == &quot;Leo&quot; &amp; filtered_dates$Date &lt; &quot;2021-2-06&quot;)&amp;!(filtered_dates$Dog.name == &quot;Leo&quot; &amp; filtered_dates$Date &gt; &quot;2021-04-19&quot;),]</code></pre>
 <p>Rename columns</p>
+<pre class="r"><code>#renamecolumns
+filtered_dates&lt;-rename(filtered_dates, &quot;name&quot;=Dog.name)
+filtered_dates&lt;-rename(filtered_dates, activity_counts=&quot;Activity.Data&quot;)</code></pre>
 <p>Delete sleeping hours (10pm-8am)</p>
+<pre class="r"><code>#delete sleeping hours (10pm-8am)
+filtered_datetime&lt;- filtered_dates %&gt;% filter(hour(time)&gt;7)
+filtered_datetime&lt;- filtered_datetime %&gt;% filter(hour(time)&lt;23)</code></pre>
 <p>Adding DOB, weeks old, rearing (home vs DPK), &amp; sex columns</p>
+<pre class="r"><code>#addingDOB
+newdf&lt;-filtered_datetime %&gt;% mutate(DOB =
+                     case_when(name == &quot;Anya&quot; ~ &quot;2019-06-29&quot;,
+                               name == &quot;Aries&quot; ~ &quot;2019-06-29&quot;,
+                                name == &quot;Weston&quot; ~ &quot;2019-06-26&quot;,
+                                name == &quot;Ying&quot; ~ &quot;2019-06-27&quot;,
+                                name == &quot;Yolanda&quot; ~ &quot;2019-06-27&quot;,
+                                name == &quot;Zina&quot; ~ &quot;2019-06-28&quot;,
+                                name == &quot;Zax&quot; ~ &quot;2019-06-28&quot;,
+                                name == &quot;Arthur&quot; ~ &quot;2019-12-12&quot;,
+                                name == &quot;Aurora&quot; ~ &quot;2019-12-12&quot;,
+                                name == &quot;Westley&quot; ~ &quot;2019-12-06&quot;,
+                                name == &quot;Wisdom&quot; ~ &quot;2019-12-06&quot;,
+                                name == &quot;Yonder&quot; ~ &quot;2019-12-11&quot;,
+                                name == &quot;Zola&quot; ~ &quot;2019-12-11&quot;,
+                                name == &quot;Zindel&quot; ~ &quot;2019-12-11&quot;,
+                                name == &quot;Kristoff&quot; ~ &quot;2020-05-05&quot;,
+                                name == &quot;Barley&quot; ~ &quot;2020-05-06&quot;,
+                                name == &quot;Rainbow&quot; ~ &quot;2020-08-02&quot;,
+                                name == &quot;Sassy&quot; ~ &quot;2020-08-12&quot;,
+                                name == &quot;Sparky&quot; ~ &quot;2020-08-12&quot;,
+                                name == &quot;Stanley&quot; ~ &quot;2020-08-12&quot;,
+                                name == &quot;Lily&quot; ~ &quot;2020-12-11&quot;,
+                                name == &quot;Leo&quot; ~ &quot;2020-12-11&quot;,
+                                name == &quot;Jack&quot; ~ &quot;2020-12-11&quot;))
+#make DOB in date format
+newdf$DOB &lt;- as.Date(newdf$DOB, format= &quot;%Y-%m-%d&quot;)
+
+# exact weeks / age column
+newdf&lt;-newdf %&gt;% mutate(exactage =
+                       difftime(Date, DOB, units=&quot;weeks&quot;))
+#make weeks old column (rounded)
+newdf&lt;-newdf%&gt;% mutate(weeksold =
+                         case_when(exactage &gt;= 8 &amp; exactage &lt; 9 ~8,
+                                   exactage &gt;= 9 &amp; exactage &lt; 10 ~9,
+                                   exactage &gt;= 10 &amp; exactage &lt; 11 ~10,
+                                   exactage &gt;= 11 &amp; exactage &lt; 12 ~11,
+                                   exactage &gt;= 12 &amp; exactage &lt; 13 ~12,
+                                   exactage &gt;= 13 &amp; exactage &lt; 14 ~13,
+                                   exactage &gt;= 14 &amp; exactage &lt; 15 ~14,
+                                   exactage &gt;= 15 &amp; exactage &lt; 16 ~15,
+                                   exactage &gt;= 16 &amp; exactage &lt; 17 ~16,
+                                   exactage &gt;= 17 &amp; exactage &lt; 18 ~17,
+                                   exactage &gt;= 18 &amp; exactage &lt; 19 ~18,
+                                   exactage &gt;= 19 &amp; exactage &lt; 20 ~19,
+                                   exactage &gt;= 20 ~20,)) 
+
+#adding rearing column (home based vs. DPK) 
+#note: Spring 2020 puppies are &quot;home-based&quot; from 8-10 weeks
+newdf&lt;-newdf %&gt;% mutate(rearing =
+                          case_when(name == &quot;Anya&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Aries&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Weston&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Ying&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Yolanda&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Zina&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Zax&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Arthur&quot; &amp; Date &lt;&quot;2020-02-17&quot;  ~ &quot;home&quot;,
+                                    name == &quot;Arthur&quot; &amp; Date &gt;=&quot;2020-02-17&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Aurora&quot; &amp; Date &lt;&quot;2020-02-17&quot;  ~ &quot;home&quot;,
+                                    name == &quot;Aurora&quot; &amp; Date &gt;=&quot;2020-02-17&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Westley&quot; &amp; Date &lt;&quot;2020-02-17&quot;  ~ &quot;home&quot;,
+                                    name == &quot;Westley&quot; &amp; Date &gt;=&quot;2020-02-17&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Wisdom&quot; &amp; Date &lt;&quot;2020-02-17&quot;  ~ &quot;home&quot;,
+                                    name == &quot;Wisdom&quot; &amp; Date &gt;=&quot;2020-02-17&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Yonder&quot; &amp; Date &lt;&quot;2020-02-17&quot;  ~ &quot;home&quot;,
+                                    name == &quot;Yonder&quot; &amp; Date &gt;=&quot;2020-02-17&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Zindel&quot; &amp; Date &lt;&quot;2020-02-17&quot;  ~ &quot;home&quot;,
+                                    name == &quot;Zindel&quot; &amp; Date &gt;=&quot;2020-02-17&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Zola&quot; &amp; Date &lt;&quot;2020-02-17&quot;  ~ &quot;home&quot;,
+                                    name == &quot;Zola&quot; &amp; Date &gt;=&quot;2020-02-17&quot; ~ &quot;DPK&quot;,
+                                    name == &quot;Kristoff&quot; ~ &quot;home&quot;,
+                                    name == &quot;Barley&quot; ~ &quot;home&quot;,
+                                    name == &quot;Rainbow&quot; ~ &quot;home&quot;,
+                                    name == &quot;Sassy&quot; ~ &quot;home&quot;,
+                                    name == &quot;Sparky&quot; ~ &quot;home&quot;,
+                                    name == &quot;Stanley&quot; ~ &quot;home&quot;,
+                                    name == &quot;Lily&quot; ~ &quot;home&quot;,
+                                    name == &quot;Leo&quot; ~ &quot;home&quot;,
+                                    name == &quot;Jack&quot; ~ &quot;home&quot;))
+#adding sex column 
+newdf&lt;-newdf %&gt;% mutate(sex =
+                          case_when(name == &quot;Anya&quot; ~ &quot;F&quot;,
+                                    name == &quot;Aries&quot; ~ &quot;M&quot;,
+                                    name == &quot;Weston&quot; ~ &quot;M&quot;,
+                                    name == &quot;Ying&quot; ~ &quot;M&quot;,
+                                    name == &quot;Yolanda&quot; ~ &quot;F&quot;,
+                                    name == &quot;Zina&quot; ~ &quot;F&quot;,
+                                    name == &quot;Zax&quot; ~ &quot;M&quot;,
+                                    name == &quot;Arthur&quot; ~ &quot;M&quot;,
+                                    name == &quot;Aurora&quot; ~ &quot;F&quot;,
+                                    name == &quot;Westley&quot; ~ &quot;M&quot;,
+                                    name == &quot;Wisdom&quot; ~ &quot;F&quot;,
+                                    name == &quot;Yonder&quot; ~ &quot;F&quot;,
+                                    name == &quot;Zola&quot; ~ &quot;F&quot;,
+                                    name == &quot;Zindel&quot; ~ &quot;M&quot;,
+                                    name == &quot;Kristoff&quot; ~ &quot;M&quot;,
+                                    name == &quot;Barley&quot; ~ &quot;M&quot;,
+                                    name == &quot;Rainbow&quot; ~ &quot;F&quot;,
+                                    name == &quot;Sassy&quot; ~ &quot;F&quot;,
+                                    name == &quot;Sparky&quot; ~ &quot;M&quot;,
+                                    name == &quot;Stanley&quot; ~ &quot;M&quot;,
+                                    name == &quot;Lily&quot; ~ &quot;F&quot;,
+                                    name == &quot;Leo&quot; ~ &quot;M&quot;,
+                                    name == &quot;Jack&quot; ~ &quot;M&quot;))</code></pre>
 <p>Make hour column</p>
+<pre class="r"><code>newdf&lt;-newdf %&gt;% mutate(hour=
+                         (hour(time)))</code></pre>
 <p>Make combined column for date and time</p>
+<pre class="r"><code>newdf &lt;- newdf %&gt;% mutate(datetime=as.POSIXct(paste(Date,time), format=&quot;%Y-%m-%d %H:%M:%S&quot;))</code></pre>
 <p>Create 5 minute intervals labels</p>
+<pre class="r"><code>newdf &lt;- newdf %&gt;% mutate(interval=cut(newdf$datetime, breaks = &quot;5 min&quot;))
+newdf &lt;- newdf %&gt;% mutate(intervaltime=as.POSIXct(newdf$interval))
+newdf &lt;- newdf %&gt;% mutate(intervaltime=format(newdf$interval, format = &quot;%H:%M:%S&quot;))
+
+#turn interval into datetime class
+newdf$intervaltime2&lt;-strptime(newdf$intervaltime, format=&#39;%Y-%m-%d %H:%M:%S&#39;)
+
+#make column &quot;intervaltime&quot; just for interval time
+newdf$intervaltime&lt;-strftime(newdf$intervaltime2, &#39;%H:%M&#39;)</code></pre>
 <p>For each puppy, find an average of activity for each 5 minute interval (make one mean activity count for each interval)</p>
+<pre class="r"><code>intervaldf&lt;-newdf %&gt;% 
+     group_by(intervaltime,weeksold,name,rearing,sex) %&gt;% 
+   summarise(interval_avg_activity=mean(activity_counts))</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;intervaltime&#39;, &#39;weeksold&#39;, &#39;name&#39;, &#39;rearing&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>intervaldf2&lt;-newdf %&gt;% 
+     group_by(intervaltime,Date,weeksold,name,rearing,sex) %&gt;% 
+   summarise(interval_avg_activity=mean(activity_counts))</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;intervaltime&#39;, &#39;Date&#39;, &#39;weeksold&#39;, &#39;name&#39;, &#39;rearing&#39;. You can override using the `.groups` argument.</code></pre>
 <p>Deviance from weekly means (for each puppy) for each (5 min interval) data point (creates indiv_weekly_dev df)</p>
+<pre class="r"><code>#means for each puppy for each week of age
+weeklymeanforage_bypuppy&lt;-intervaldf %&gt;% group_by(name, weeksold) %&gt;% 
+  summarize(&quot;weeklymeanforage_bypuppy&quot;=mean(interval_avg_activity), N=n()) </code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;name&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code># merge two data frames: weekly mean for each puppy and hourly mean
+#places each weekly mean next to its corresponding interval data point
+indiv_weekly_dev&lt;- merge(intervaldf,weeklymeanforage_bypuppy,by=c(&quot;name&quot;,&quot;weeksold&quot;))
+#deviance from the weekly mean (for each puppy) for each (5 min interval) data point 
+indiv_weekly_dev&lt;-indiv_weekly_dev %&gt;% mutate(meandeviance=(interval_avg_activity-weeklymeanforage_bypuppy))</code></pre>
 <p>Find an average of activity for each week for each 5 minute interval (make one mean activity count for each interval) (not by puppy, for the entire group)</p>
+<pre class="r"><code>weeklyintervaldf&lt;-indiv_weekly_dev %&gt;% 
+     group_by(intervaltime,weeksold) %&gt;% 
+   summarise(interval_avg_deviance=mean(meandeviance),
+             interval_weekly_avg=mean(interval_avg_activity))</code></pre>
 <pre><code>## `summarise()` has grouped output by &#39;intervaltime&#39;. You can override using the `.groups` argument.</code></pre>
 <table style="width:6%;">
 <colgroup>
@@ -323,19 +525,65 @@ $(document).ready(function () {
 <td>Store weeks old as a factor</td>
 </tr>
 <tr class="even">
-<td>List of desired hourly time breaks for graph x axis tick marks</td>
+<td><code>r weeklyintervaldf$weeksold&lt;-as.factor(weeklyintervaldf$weeksold) indiv_weekly_dev$weeksold&lt;-as.factor(indiv_weekly_dev$weeksold)</code> List of desired hourly time breaks for graph x axis tick marks</td>
 </tr>
 <tr class="odd">
+<td><code>r hours_list&lt;-c("08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00")</code></td>
+</tr>
+<tr class="even">
 <td>#MEAN DEVIANCE GRAPHS</td>
 </tr>
 </tbody>
 </table>
-<p>INDIVIDUAL GRAPHS FOR 1 INDIVIDUAL PUPPY FOR 1 INDIVIDUAL WEEK <img src="code_files/figure-html/unnamed-chunk-15-1.png" width="672" /> GRAPH OF MEAN DEVIANCE (GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK <img src="code_files/figure-html/unnamed-chunk-16-1.png" width="672" /> COMPARE TWO PUPPIES’ MEAN DEVIANCE FOR 1 SPECIFIC WEEK <img src="code_files/figure-html/unnamed-chunk-17-1.png" width="672" /> GROUP AVG FOR 1 INDIVIDUAL WEEK <img src="code_files/figure-html/unnamed-chunk-18-1.png" width="672" /> GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP MEAN DEVIANCE) <img src="code_files/figure-html/unnamed-chunk-19-1.png" width="672" /> GRAPHS OF ALL WEEKS FOR 1 INDIVIDUAL PUPPY <img src="code_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
-<p>GRAPHS OF GROUP DEVIANCE: 8 VS 20 WEEKS <img src="code_files/figure-html/unnamed-chunk-21-1.png" width="672" /> GRAPHS OF GROUP DEVIANCE: 8, 14, &amp; 20 WEEKS <img src="code_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<p>INDIVIDUAL GRAPHS FOR 1 INDIVIDUAL PUPPY FOR 1 INDIVIDUAL WEEK</p>
+<pre class="r"><code>#Leo, 8 weeks
+ggplot(subset(indiv_weekly_dev,weeksold==&quot;8&quot; &amp; name==&quot;Leo&quot;), aes(x=intervaltime, y=meandeviance, group=1)) + ylim(-500,2500) + geom_line() + ggtitle(&quot;Leo: 8 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) +
+  scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-15-1.png" width="672" /> GRAPH OF MEAN DEVIANCE (GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK</p>
+<pre class="r"><code>ggplot(subset(indiv_weekly_dev,weeksold==&quot;8&quot;), aes(x=intervaltime, y=meandeviance, group=&#39;name&#39;)) + geom_line(aes(colour=name)) + ggtitle(&quot;Mean Deviance: 8 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Deviance&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-16-1.png" width="672" /> COMPARE TWO PUPPIES’ MEAN DEVIANCE FOR 1 SPECIFIC WEEK</p>
+<pre class="r"><code>ggplot(subset(indiv_weekly_dev,name==&quot;Rainbow&quot;|name==&quot;Stanley&quot;&amp;weeksold==12), aes(x=intervaltime, y=meandeviance, group=name)) + geom_line(aes(colour=name)) + ggtitle(&quot;Mean Deviance: 12 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Deviance&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-17-1.png" width="672" /> GROUP AVG FOR 1 INDIVIDUAL WEEK</p>
+<pre class="r"><code>#8 weeks
+ggplot(subset(weeklyintervaldf,weeksold==&quot;8&quot;), aes(x=intervaltime, y=interval_avg_deviance, group=1)) + geom_line() + ggtitle(&quot;Group: 8 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-18-1.png" width="672" /> GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP MEAN DEVIANCE)</p>
+<pre class="r"><code>ggplot(weeklyintervaldf, aes(x=intervaltime, y=interval_avg_deviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8-20 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-19-1.png" width="672" /> GRAPHS OF ALL WEEKS FOR 1 INDIVIDUAL PUPPY</p>
+<pre class="r"><code>ggplot(subset(indiv_weekly_dev,name==&quot;Rainbow&quot;), aes(x=intervaltime, y=meandeviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Rainbow: 8-20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>GRAPHS OF GROUP DEVIANCE: 8 VS 20 WEEKS</p>
+<pre class="r"><code>ggplot((subset(weeklyintervaldf,weeksold==&quot;8&quot; | weeksold==&quot;20&quot;)), aes(x=intervaltime, y=interval_avg_deviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8 vs. 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Activity Counts (mean deviance)&quot;) +ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-21-1.png" width="672" /> GRAPHS OF GROUP DEVIANCE: 8, 14, &amp; 20 WEEKS</p>
+<pre class="r"><code>ggplot((subset(weeklyintervaldf,weeksold==&quot;8&quot; | weeksold==&quot;14&quot;| weeksold==&quot;20&quot;)), aes(x=intervaltime, y=interval_avg_deviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8, 14, &amp; 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Activity Counts (mean deviance)&quot;) +ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
 </div>
 <div id="mean-activity-count-graphs-raw-mean-activity-not-deviance" class="section level2">
 <h2>#MEAN ACTIVITY COUNT GRAPHS (raw mean activity, not deviance)</h2>
-<p>INDIVIDUAL GRAPH OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL PUPPY FOR 1 INDIVIDUAL WEEK <img src="code_files/figure-html/unnamed-chunk-23-1.png" width="672" /> GRAPH OF RAW (MEAN) ACTIVITY COUNTS GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK <img src="code_files/figure-html/unnamed-chunk-24-1.png" width="672" /><img src="code_files/figure-html/unnamed-chunk-24-2.png" width="672" /> COMPARE TWO PUPPIES’ RAW MEAN ACTIVITY COUNTS FOR 1 SPECIFIC WEEK <img src="code_files/figure-html/unnamed-chunk-25-1.png" width="672" /> GROUP AVG OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL WEEK <img src="code_files/figure-html/unnamed-chunk-26-1.png" width="672" /><img src="code_files/figure-html/unnamed-chunk-26-2.png" width="672" /> GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP RAW MEAN ACTIVITY COUNTS) <img src="code_files/figure-html/unnamed-chunk-27-1.png" width="672" /> GRAPHS OF GROUP: 8 VS 20 WEEKS (RAW MEAN ACTIVITY COUNTS) <img src="code_files/figure-html/unnamed-chunk-28-1.png" width="672" /> GRAPHS OF GROUP: 8, 14, &amp; 20 WEEKS <img src="code_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
+<p>INDIVIDUAL GRAPH OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL PUPPY FOR 1 INDIVIDUAL WEEK</p>
+<pre class="r"><code>#Arthur, 8 weeks
+#can add ylim(-500,2500)
+ggplot(subset(intervaldf,weeksold==&quot;8&quot; &amp; name==&quot;Sassy&quot;), aes(x=intervaltime, y=interval_avg_activity, group=1)) + geom_line() + ggtitle(&quot;Arthur: 8 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) +
+  scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-23-1.png" width="672" /> GRAPH OF RAW (MEAN) ACTIVITY COUNTS GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK</p>
+<pre class="r"><code>ggplot(subset(intervaldf,weeksold==&quot;8&quot;), aes(x=intervaltime, y=interval_avg_activity, group=&#39;name&#39;)) + geom_line(aes(colour=name)) + ggtitle(&quot;Group Activity Counts: 8 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(subset(intervaldf,weeksold==&quot;18&quot;), aes(x=intervaltime, y=interval_avg_activity, group=&#39;name&#39;)) + geom_line(aes(colour=name)) + ggtitle(&quot;Group Activity Counts: 18 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-24-2.png" width="672" /> COMPARE TWO PUPPIES’ RAW MEAN ACTIVITY COUNTS FOR 1 SPECIFIC WEEK</p>
+<pre class="r"><code>###graph is now fixed!
+ggplot(subset(intervaldf,name==&quot;Sassy&quot;&amp;weeksold==8|name==&quot;Arthur&quot;&amp;weeksold==8), aes(x=intervaltime, y=interval_avg_activity, group=name)) + geom_line(aes(colour=name)) + ggtitle(&quot;Mean Activity Counts: 8 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-25-1.png" width="672" /> GROUP AVG OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL WEEK</p>
+<pre class="r"><code>#8 weeks
+ggplot(subset(weeklyintervaldf,weeksold==&quot;8&quot;), aes(x=intervaltime, y=interval_weekly_avg, group=1)) + geom_line() + ggtitle(&quot;Group: 8 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<pre class="r"><code>#20 weeks
+ggplot(subset(weeklyintervaldf,weeksold==&quot;20&quot;), aes(x=intervaltime, y=interval_weekly_avg, group=1)) + geom_line() + ggtitle(&quot;Group: 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-26-2.png" width="672" /> GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP RAW MEAN ACTIVITY COUNTS)</p>
+<pre class="r"><code>ggplot(weeklyintervaldf, aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8-20 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-27-1.png" width="672" /> GRAPHS OF GROUP: 8 VS 20 WEEKS (RAW MEAN ACTIVITY COUNTS)</p>
+<pre class="r"><code>ggplot((subset(weeklyintervaldf,weeksold==&quot;8&quot; | weeksold==&quot;20&quot;)), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8 vs. 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-28-1.png" width="672" /> GRAPHS OF GROUP: 8, 14, &amp; 20 WEEKS</p>
+<pre class="r"><code>ggplot((subset(weeklyintervaldf,weeksold==&quot;8&quot; | weeksold==&quot;14&quot;| weeksold==&quot;20&quot;)), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8, 14, &amp; 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-29-1.png" width="672" /></p>
 <table style="width:6%;">
 <colgroup>
 <col width="5%" />
@@ -350,7 +598,19 @@ $(document).ready(function () {
 <td>Rest/wake thresholds</td>
 </tr>
 <tr class="even">
+<td>```r #set threshold for sleeping/awake sleepbouts&lt;-indiv_weekly_dev %&gt;% mutate(state=case_when(interval_avg_activity &gt;= 100 ~ “awake”,interval_avg_activity &lt;100 ~ “rest”))</td>
+</tr>
+<tr class="odd">
+<td>#make column for interval end time library(lubridate) sleepbouts &lt;-sleepbouts %&gt;% mutate(intervaltime2=as.POSIXct(intervaltime, format=“%H:%M”)) sleepbouts &lt;-sleepbouts %&gt;% mutate(intervalend=(intervaltime2+(5*60))) sleepbouts &lt;-sleepbouts %&gt;% mutate(intervalend=strftime(intervalend, format=“%H:%M”)) sleepbouts &lt;-sleepbouts %&gt;% select(-intervaltime2)</td>
+</tr>
+<tr class="even">
+<td>#assign group numbers to unique sleep periods sleepbouts&lt;-sleepbouts %&gt;% mutate(timeperiod = hm(intervaltime), timeperiod_end = hm(intervalend)) %&gt;% group_by(name,weeksold) %&gt;% arrange(intervaltime) %&gt;% mutate (group = data.table::rleid(state)) ```</td>
+</tr>
+<tr class="odd">
 <td>Intervals of resting and wakefulness</td>
+</tr>
+<tr class="even">
+<td><code>r sleepbout_intervals&lt;-sleepbouts %&gt;% group_by(name,weeksold,group) %&gt;% summarise(intervaltime = paste(first(intervaltime), last(intervalend), sep = '-'), state = first(state), timeperiod = last(timeperiod_end) - first(timeperiod))</code></td>
 </tr>
 <tr class="odd">
 <td><code>## Note: method with signature 'Period#ANY' chosen for function '-', ##  target signature 'Period#Period'. ##  "ANY#Period" would also be valid</code></td>
@@ -359,45 +619,110 @@ $(document).ready(function () {
 <td><code>## `summarise()` has grouped output by 'name', 'weeksold'. You can override using the `.groups` argument.</code></td>
 </tr>
 <tr class="odd">
+<td>```r #Convert timeperiod class to minutes library(lubridate) sleepbout_intervals&lt;-sleepbout_intervals %&gt;% mutate(timeperiod_secs=time_length(timeperiod), timeperiod_mins=timeperiod_secs/60) %&gt;% select(-timeperiod_secs)</td>
+</tr>
+<tr class="even">
+<td>#Find average &amp; total length of rest vs awake states for each week sleepbout_weeklyavg &lt;- sleepbout_intervals %&gt;% group_by(weeksold,state) %&gt;% summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins)) ```</td>
+</tr>
+<tr class="odd">
 <td><code>## `summarise()` has grouped output by 'weeksold'. You can override using the `.groups` argument.</code></td>
 </tr>
 <tr class="even">
 <td>Calculate rest/wake duration (avg and total) for each puppy for each week, add rearing &amp; sex info</td>
 </tr>
 <tr class="odd">
-<td><code>## `summarise()` has grouped output by 'weeksold', 'name'. You can override using the `.groups` argument.</code> Compare home vs. DPK pups</td>
+<td><code>r sleepbout_weeklyavg_bypuppy &lt;- sleepbout_intervals %&gt;% group_by(weeksold,name,state) %&gt;% summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))</code></td>
 </tr>
 <tr class="even">
+<td><code>## `summarise()` has grouped output by 'weeksold', 'name'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="odd">
+<td><code>r sleepbout_weeklyavg_bypuppy$weeksold&lt;-as.character(sleepbout_weeklyavg_bypuppy$weeksold) sleepbout_weeklyavg_bypuppy&lt;-sleepbout_weeklyavg_bypuppy %&gt;% mutate(rearing = case_when(name == "Anya" ~ "DPK", name == "Aries" ~ "DPK", name == "Weston" ~ "DPK", name == "Ying" ~ "DPK", name == "Yolanda" ~ "DPK", name == "Zina" ~ "DPK", name == "Zax" ~ "DPK", name == "Arthur" &amp; weeksold &lt;10 ~ "home", name == "Arthur" &amp; weeksold &gt;9 ~ "DPK", name == "Aurora" &amp; weeksold &lt;10  ~ "home", name == "Aurora" &amp; weeksold &gt;9 ~ "DPK", name == "Westley" &amp; weeksold &lt;10 ~ "home", name == "Westley" &amp; weeksold &gt;9 ~ "DPK", name == "Wisdom" &amp; weeksold &lt;10  ~ "home", name == "Wisdom" &amp; weeksold &gt;9 ~ "DPK", name == "Yonder" &amp; weeksold &lt;10 ~ "home", name == "Yonder" &amp; weeksold &gt;9 ~ "DPK", name == "Zindel" &amp; weeksold &lt; 10  ~ "home", name == "Zindel" &amp; weeksold &gt;9 ~ "DPK", name == "Zola" &amp; weeksold &lt;10  ~ "home", name == "Zola" &amp; weeksold &gt;9 ~ "DPK", name == "Kristoff" ~ "home", name == "Barley" ~ "home", name == "Rainbow" ~ "home", name == "Sassy" ~ "home", name == "Sparky" ~ "home", name == "Stanley" ~ "home", name == "Lily" ~ "home", name == "Leo" ~ "home", name == "Jack" ~ "home"), sex=case_when(name == "Anya" ~ "F", name == "Aries" ~ "M", name == "Weston" ~ "M", name == "Ying" ~ "M", name == "Yolanda" ~ "F", name == "Zina" ~ "F", name == "Zax" ~ "M", name == "Arthur" ~ "M", name == "Aurora" ~ "F", name == "Westley" ~ "M", name == "Wisdom" ~ "F", name == "Yonder" ~ "F", name == "Zola" ~ "F", name == "Zindel" ~ "M", name == "Kristoff" ~ "M", name == "Barley" ~ "M", name == "Rainbow" ~ "F", name == "Sassy" ~ "F", name == "Sparky" ~ "M", name == "Stanley" ~ "M", name == "Lily" ~ "F", name == "Leo" ~ "M", name == "Jack" ~ "M")) sleepbout_weeklyavg_bypuppy$weeksold&lt;-as.numeric(as.character(sleepbout_weeklyavg_bypuppy$weeksold))</code> Compare home vs. DPK pups</td>
+</tr>
+<tr class="even">
+<td><code>r sleepbout_weeklyavg_rearing &lt;- sleepbout_weeklyavg_bypuppy %&gt;% group_by(weeksold,state,rearing) %&gt;% summarize(Mean_mins=mean(Mean_mins), N=n(),Total_mins=sum(Total_mins))</code></td>
+</tr>
+<tr class="odd">
 <td><code>## `summarise()` has grouped output by 'weeksold', 'state'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="even">
+<td><code>r sleepbout_weeklyavg_rearing$weeksold&lt;-as.numeric(as.character(sleepbout_weeklyavg_rearing$weeksold))</code></td>
 </tr>
 <tr class="odd">
 <td>Without collapsing across days:</td>
 </tr>
 <tr class="even">
+<td>```r #set threshold for sleeping/awake sleepbouts2&lt;-intervaldf2 %&gt;% mutate(state=case_when(interval_avg_activity &gt;= 100 ~ “awake”,interval_avg_activity &lt;100 ~ “rest”))</td>
+</tr>
+<tr class="odd">
+<td>#make column for interval end time library(lubridate) sleepbouts2 &lt;-sleepbouts2 %&gt;% mutate(intervaltime2=as.POSIXct(intervaltime, format=“%H:%M”)) sleepbouts2 &lt;-sleepbouts2 %&gt;% mutate(intervalend=(intervaltime2+(5*60))) sleepbouts2 &lt;-sleepbouts2 %&gt;% mutate(intervalend=strftime(intervalend, format=“%H:%M”)) sleepbouts2 &lt;-sleepbouts2 %&gt;% select(-intervaltime2)</td>
+</tr>
+<tr class="even">
+<td>#assign group numbers to unique sleep periods sleepbouts2&lt;-sleepbouts2 %&gt;% mutate(timeperiod = hm(intervaltime), timeperiod_end = hm(intervalend)) %&gt;% group_by(name,weeksold) %&gt;% arrange(Date,name, intervaltime) %&gt;% mutate (group = data.table::rleid(state))</td>
+</tr>
+<tr class="odd">
+<td>#Intervals of resting and wakefulness for each <strong>DAY</strong> sleepbout_intervals2&lt;-sleepbouts2 %&gt;% group_by(name,Date,weeksold,group) %&gt;% summarise(intervaltime = paste(first(intervaltime), last(intervalend), sep = ‘-’), state = first(state), timeperiod = last(timeperiod_end) - first(timeperiod)) ```</td>
+</tr>
+<tr class="even">
 <td><code>## `summarise()` has grouped output by 'name', 'Date', 'weeksold'. You can override using the `.groups` argument.</code></td>
 </tr>
 <tr class="odd">
+<td><code>r library(lubridate) sleepbout_intervals2&lt;-sleepbout_intervals2 %&gt;% mutate(timeperiod_secs=time_length(timeperiod), timeperiod_mins=timeperiod_secs/60) %&gt;% select(-timeperiod_secs) ####start here #collapse to get average in each interval per week sleepbout_intervals2_collapsed_bypuppy&lt;-sleepbout_intervals2 %&gt;% group_by(weeksold,name,intervaltime,state) %&gt;%summarise(interval_avg_activity=mean(timeperiod_mins))</code></td>
+</tr>
+<tr class="even">
 <td><code>## `summarise()` has grouped output by 'weeksold', 'name', 'intervaltime'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="odd">
+<td><code>r sleepbout_intervals2_collapsed&lt;-sleepbout_intervals2 %&gt;% group_by(weeksold,intervaltime,state) %&gt;%summarise(interval_avg_activity=mean(timeperiod_mins))</code></td>
 </tr>
 <tr class="even">
 <td><code>## `summarise()` has grouped output by 'weeksold', 'intervaltime'. You can override using the `.groups` argument.</code></td>
 </tr>
 <tr class="odd">
+<td><code>r sleepbout_weeklyavg2 &lt;- sleepbout_intervals2 %&gt;% group_by(weeksold,state) %&gt;% summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))</code></td>
+</tr>
+<tr class="even">
 <td><code>## `summarise()` has grouped output by 'weeksold'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="odd">
+<td><code>r sleepbout_weeklyavg_bypuppy2 &lt;- sleepbout_intervals2 %&gt;% group_by(weeksold,name,state) %&gt;% summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))</code></td>
 </tr>
 <tr class="even">
 <td><code>## `summarise()` has grouped output by 'weeksold', 'name'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="odd">
+<td><code>r sleepbout_weeklyavg_bypuppy2$weeksold&lt;-as.character(sleepbout_weeklyavg_bypuppy2$weeksold) sleepbout_weeklyavg_bypuppy2&lt;-sleepbout_weeklyavg_bypuppy2 %&gt;% mutate(rearing = case_when(name == "Anya" ~ "DPK", name == "Aries" ~ "DPK", name == "Weston" ~ "DPK", name == "Ying" ~ "DPK", name == "Yolanda" ~ "DPK", name == "Zina" ~ "DPK", name == "Zax" ~ "DPK", name == "Arthur" &amp; weeksold &lt;10 ~ "home", name == "Arthur" &amp; weeksold &gt;9 ~ "DPK", name == "Aurora" &amp; weeksold &lt;10  ~ "home", name == "Aurora" &amp; weeksold &gt;9 ~ "DPK", name == "Westley" &amp; weeksold &lt;10 ~ "home", name == "Westley" &amp; weeksold &gt;9 ~ "DPK", name == "Wisdom" &amp; weeksold &lt;10  ~ "home", name == "Wisdom" &amp; weeksold &gt;9 ~ "DPK", name == "Yonder" &amp; weeksold &lt;10 ~ "home", name == "Yonder" &amp; weeksold &gt;9 ~ "DPK", name == "Zindel" &amp; weeksold &lt; 10  ~ "home", name == "Zindel" &amp; weeksold &gt;9 ~ "DPK", name == "Zola" &amp; weeksold &lt;10  ~ "home", name == "Zola" &amp; weeksold &gt;9 ~ "DPK", name == "Kristoff" ~ "home", name == "Barley" ~ "home", name == "Rainbow" ~ "home", name == "Sassy" ~ "home", name == "Sparky" ~ "home", name == "Stanley" ~ "home", name == "Lily" ~ "home", name == "Leo" ~ "home", name == "Jack" ~ "home"), sex=case_when(name == "Anya" ~ "F", name == "Aries" ~ "M", name == "Weston" ~ "M", name == "Ying" ~ "M", name == "Yolanda" ~ "F", name == "Zina" ~ "F", name == "Zax" ~ "M", name == "Arthur" ~ "M", name == "Aurora" ~ "F", name == "Westley" ~ "M", name == "Wisdom" ~ "F", name == "Yonder" ~ "F", name == "Zola" ~ "F", name == "Zindel" ~ "M", name == "Kristoff" ~ "M", name == "Barley" ~ "M", name == "Rainbow" ~ "F", name == "Sassy" ~ "F", name == "Sparky" ~ "M", name == "Stanley" ~ "M", name == "Lily" ~ "F", name == "Leo" ~ "M", name == "Jack" ~ "M")) sleepbout_weeklyavg_bypuppy$weeksold&lt;-as.numeric(as.character(sleepbout_weeklyavg_bypuppy$weeksold))</code></td>
 </tr>
 </tbody>
 </table>
 </div>
 <div id="plotting-restwake-bouts" class="section level2">
 <h2>#PLOTTING REST/WAKE BOUTS</h2>
-<p>Compare average rest/wake bout durations in 1 individual week <img src="code_files/figure-html/unnamed-chunk-35-1.png" width="672" /> Compare average rest/awake bout durations for each week <img src="code_files/figure-html/unnamed-chunk-36-1.png" width="672" /><img src="code_files/figure-html/unnamed-chunk-36-2.png" width="672" /> Total Minutes of Rest by Week <img src="code_files/figure-html/unnamed-chunk-37-1.png" width="672" /> AVG REST HOME VS. DPK <img src="code_files/figure-html/unnamed-chunk-38-1.png" width="672" /><img src="code_files/figure-html/unnamed-chunk-38-2.png" width="672" /></p>
+<p>Compare average rest/wake bout durations in 1 individual week</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,weeksold==&quot;20&quot;), aes(x=state, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle(&quot;Average Sleep/Awake Bout Duration: 20 weeks&quot;) + xlab(&quot;State&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;State&quot;)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-35-1.png" width="672" /> Compare average rest/awake bout durations for each week</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;awake&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Avg Duration of Awake Bouts by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Avg Duration of Rest Bouts by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-36-2.png" width="672" /> Total Minutes of Rest by Week</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;rest&quot;), aes(x=weeksold, y=Total_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Average Total Rest by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Total Rest (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-37-1.png" width="672" /> AVG REST HOME VS. DPK</p>
+<pre class="r"><code>weeks&lt;-c(8:20)
+
+ggplot(subset(sleepbout_weeklyavg_rearing,state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle(&quot;Avg Duration of Rest Bouts by Week: Home vs. DPK&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Avg State Duration (min)&quot;) + labs(colour = &quot;Rearing&quot;) + scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-38-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_rearing,state==&quot;rest&quot;), aes(x=weeksold, y=Total_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle(&quot;Average Total Rest by Week: Home vs. DPK&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Rest (mins)&quot;) + labs(colour = &quot;Rearing&quot;) + scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-38-2.png" width="672" /></p>
 </div>
 <div id="by-puppy" class="section level2">
 <h2>#BY PUPPY</h2>
-<p>Bar graph: Mean State Duration for 1 puppy by weeks <img src="code_files/figure-html/unnamed-chunk-39-1.png" width="672" /> Line graph: Mean State Duration for 1 puppy by weeks <img src="code_files/figure-html/unnamed-chunk-40-1.png" width="672" /> Line graph: mean rest state duration by week for each puppy <img src="code_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
+<p>Bar graph: Mean State Duration for 1 puppy by weeks</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, name==&quot;Leo&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle(&quot;Leo: Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-39-1.png" width="672" /> Line graph: Mean State Duration for 1 puppy by weeks</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, name==&quot;Leo&quot;), aes(x=weeksold, y=Mean_mins, group=state))+ geom_line(aes(colour=state)) + ggtitle(&quot;Leo: Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-40-1.png" width="672" /> Line graph: mean rest state duration by week for each puppy</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins, group=name))+ geom_line(aes(colour=name)) + ggtitle(&quot;Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-41-1.png" width="672" /></p>
 </div>
 <div id="export" class="section level2">
 <h2>#EXPORT</h2>
