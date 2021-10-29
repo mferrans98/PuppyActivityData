@@ -1,5 +1,5 @@
 ---
-title: "activitygraphs"
+title: "Activity Graphs"
 author: "Morgan Ferrans"
 date: "10/28/2021"
 output: html_document
@@ -99,7 +99,7 @@ ggplot(weeklyintervaldf, aes(x=intervaltime, y=interval_weekly_avg, group=weekso
 ggplot((subset(weeklyintervaldf,weeksold=="8" | weeksold=="20")), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Group: 8 vs. 20 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
 
 ```
-#### GRAPHS OF GROUP: 8, 14, & 20 WEEKS
+####  GRAPHS OF GROUP: 8, 14, & 20 WEEKS
 ```{r}
 ggplot((subset(weeklyintervaldf,weeksold=="8" | weeksold=="14"| weeksold=="20")), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Group: 8, 14, & 20 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
 
