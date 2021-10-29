@@ -1,0 +1,109 @@
+---
+title: "activitygraphs"
+author: "Morgan Ferrans"
+date: "10/28/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE)
+
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+load(file = "activitygraphsenv.RData")
+```
+
+# MEAN DEVIANCE GRAPHS
+---
+#### INDIVIDUAL GRAPHS FOR 1 INDIVIDUAL PUPPY FOR 1 INDIVIDUAL WEEK
+```{r}
+#Leo, 8 weeks
+ggplot(subset(indiv_weekly_dev,weeksold=="8" & name=="Leo"), aes(x=intervaltime, y=meandeviance, group=1)) + ylim(-500,2500) + geom_line() + ggtitle("Leo: 8 weeks") + xlab("Time") + ylab("Activity Counts (mean deviance)") + labs(colour = "Age (weeks)") +
+  scale_x_discrete(breaks=hours_list)
+```
+
+#### GRAPH OF MEAN DEVIANCE (GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK
+```{r}
+ggplot(subset(indiv_weekly_dev,weeksold=="8"), aes(x=intervaltime, y=meandeviance, group='name')) + geom_line(aes(colour=name)) + ggtitle("Mean Deviance: 8 weeks") + xlab("Time")+ ylab("Mean Deviance") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
+```
+
+#### COMPARE TWO PUPPIES' MEAN DEVIANCE FOR 1 SPECIFIC WEEK
+```{r}
+ggplot(subset(indiv_weekly_dev,name=="Rainbow"|name=="Stanley"&weeksold==12), aes(x=intervaltime, y=meandeviance, group=name)) + geom_line(aes(colour=name)) + ggtitle("Mean Deviance: 12 weeks") + xlab("Time")+ ylab("Mean Deviance") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
+```
+### GROUP AVG FOR 1 INDIVIDUAL WEEK
+```{r}
+#8 weeks
+ggplot(subset(weeklyintervaldf,weeksold=="8"), aes(x=intervaltime, y=interval_avg_deviance, group=1)) + geom_line() + ggtitle("Group: 8 weeks") + xlab("Time") + ylab("Activity Counts (mean deviance)") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+```
+#### GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP MEAN DEVIANCE)
+```{r}
+ggplot(weeklyintervaldf, aes(x=intervaltime, y=interval_avg_deviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Group: 8-20 weeks") + xlab("Time")+ ylab("Activity Counts (mean deviance)") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+```
+#### GRAPHS OF ALL WEEKS FOR 1 INDIVIDUAL PUPPY 
+```{r}
+ggplot(subset(indiv_weekly_dev,name=="Rainbow"), aes(x=intervaltime, y=meandeviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Rainbow: 8-20 weeks") + xlab("Time") + ylab("Activity Counts (mean deviance)") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+```
+
+#### GRAPHS OF GROUP DEVIANCE: 8 VS 20 WEEKS
+```{r}
+ggplot((subset(weeklyintervaldf,weeksold=="8" | weeksold=="20")), aes(x=intervaltime, y=interval_avg_deviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Group: 8 vs. 20 weeks") + xlab("Time") + ylab("Activity Counts (mean deviance)") +ylab("Activity Counts (mean deviance)") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+
+```
+#### GRAPHS OF GROUP DEVIANCE: 8, 14, & 20 WEEKS
+```{r}
+ggplot((subset(weeklyintervaldf,weeksold=="8" | weeksold=="14"| weeksold=="20")), aes(x=intervaltime, y=interval_avg_deviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Group: 8, 14, & 20 weeks") + xlab("Time") + ylab("Activity Counts (mean deviance)") +ylab("Activity Counts (mean deviance)") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+
+```
+
+
+# MEAN ACTIVITY COUNT GRAPHS (raw mean activity, not deviance)
+---
+#### INDIVIDUAL GRAPH OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL PUPPY FOR 1 INDIVIDUAL WEEK
+```{r}
+#Arthur, 8 weeks
+#can add ylim(-500,2500)
+ggplot(subset(intervaldf,weeksold=="8" & name=="Sassy"), aes(x=intervaltime, y=interval_avg_activity, group=1)) + geom_line() + ggtitle("Arthur: 8 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") +
+  scale_x_discrete(breaks=hours_list)
+```
+#### GRAPH OF RAW (MEAN) ACTIVITY COUNTS GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK
+```{r}
+ggplot(subset(intervaldf,weeksold=="8"), aes(x=intervaltime, y=interval_avg_activity, group='name')) + geom_line(aes(colour=name)) + ggtitle("Group Activity Counts: 8 weeks") + xlab("Time")+ ylab("Mean Activity Counts") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
+
+ggplot(subset(intervaldf,weeksold=="18"), aes(x=intervaltime, y=interval_avg_activity, group='name')) + geom_line(aes(colour=name)) + ggtitle("Group Activity Counts: 18 weeks") + xlab("Time")+ ylab("Mean Activity Counts") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
+```
+#### COMPARE TWO PUPPIES' RAW MEAN ACTIVITY COUNTS FOR 1 SPECIFIC WEEK
+```{r}
+###graph is now fixed!
+ggplot(subset(intervaldf,name=="Sassy"&weeksold==8|name=="Arthur"&weeksold==8), aes(x=intervaltime, y=interval_avg_activity, group=name)) + geom_line(aes(colour=name)) + ggtitle("Mean Activity Counts: 8 weeks") + xlab("Time")+ ylab("Mean Activity Counts") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
+```
+#### GROUP AVG OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL WEEK
+```{r}
+#8 weeks
+ggplot(subset(weeklyintervaldf,weeksold=="8"), aes(x=intervaltime, y=interval_weekly_avg, group=1)) + geom_line() + ggtitle("Group: 8 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+
+#20 weeks
+ggplot(subset(weeklyintervaldf,weeksold=="20"), aes(x=intervaltime, y=interval_weekly_avg, group=1)) + geom_line() + ggtitle("Group: 20 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+```
+#### GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP RAW MEAN ACTIVITY COUNTS)
+```{r}
+ggplot(weeklyintervaldf, aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Group: 8-20 weeks") + xlab("Time")+ ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+```
+#### GRAPHS OF GROUP: 8 VS 20 WEEKS (RAW MEAN ACTIVITY COUNTS)
+```{r}
+ggplot((subset(weeklyintervaldf,weeksold=="8" | weeksold=="20")), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Group: 8 vs. 20 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+
+```
+#### GRAPHS OF GROUP: 8, 14, & 20 WEEKS
+```{r}
+ggplot((subset(weeklyintervaldf,weeksold=="8" | weeksold=="14"| weeksold=="20")), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Group: 8, 14, & 20 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+
+```
+
+
+
