@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #DATA SETUP
 ---
 Load packages and import data
-```{r}
+```{r, cache=TRUE}
 library(readxl)    
 library(tidyverse)
 library(dplyr)
@@ -358,7 +358,7 @@ ggplot((subset(weeklyintervaldf,weeksold=="8" | weeksold=="14"| weeksold=="20"))
 #CALCULATE SLEEP BOUTS
 ---
 Rest/wake thresholds
-```{r}
+```{r, cache=TRUE}
 #set threshold for sleeping/awake
 sleepbouts<-indiv_weekly_dev %>% mutate(state=case_when(interval_avg_activity >= 100 ~ "awake",interval_avg_activity <100 ~ "rest"))
 
@@ -382,7 +382,7 @@ view(sleepbouts)
 ```
 
 Intervals of resting and wakefulness
-```{r}
+```{r, cache=TRUE}
 sleepbout_intervals<-sleepbouts %>% 
   group_by(name,weeksold,group) %>% 
   summarise(intervaltime = paste(first(intervaltime), last(intervalend), sep = '-'), 
@@ -474,7 +474,7 @@ sleepbout_weeklyavg_rearing$weeksold<-as.numeric(as.character(sleepbout_weeklyav
 ```
 
 Without collapsing across days:
-```{r}
+```{r, cache=TRUE}
 #set threshold for sleeping/awake
 sleepbouts2<-intervaldf2 %>% mutate(state=case_when(interval_avg_activity >= 100 ~ "awake",interval_avg_activity <100 ~ "rest"))
 
