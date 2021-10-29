@@ -377,6 +377,8 @@ sleepbouts<-sleepbouts %>%
   group_by(name,weeksold) %>% 
   arrange(intervaltime) %>% 
   mutate (group = data.table::rleid(state))
+
+view(sleepbouts)
 ```
 
 Intervals of resting and wakefulness
@@ -393,9 +395,12 @@ sleepbout_intervals<-sleepbout_intervals %>% mutate(timeperiod_secs=time_length(
                                      timeperiod_mins=timeperiod_secs/60) %>% 
   select(-timeperiod_secs)
 
+view(sleepbout_intervals)
+
 #Find average & total length of rest vs awake states for each week
 sleepbout_weeklyavg <- sleepbout_intervals %>% group_by(weeksold,state) %>% 
   summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))
+view(sleepbout_weeklyavg)
 ```
 
 Calculate rest/wake duration (avg and total) for each puppy for each week, add rearing & sex info
@@ -459,6 +464,8 @@ sleepbout_weeklyavg_bypuppy<-sleepbout_weeklyavg_bypuppy %>% mutate(rearing =
                                     name == "Leo" ~ "M",
                                     name == "Jack" ~ "M"))
 sleepbout_weeklyavg_bypuppy$weeksold<-as.numeric(as.character(sleepbout_weeklyavg_bypuppy$weeksold))
+
+view(sleepbout_weeklyavg_bypuppy)
 ```
 Compare home vs. DPK pups
 ```{r}
@@ -485,6 +492,8 @@ sleepbouts2<-sleepbouts2 %>%
   group_by(name,weeksold) %>% 
   arrange(Date,name, intervaltime) %>% 
   mutate (group = data.table::rleid(state))
+
+view(sleepbouts2)
 
 #Intervals of resting and wakefulness for each **DAY**
 sleepbout_intervals2<-sleepbouts2 %>% 
