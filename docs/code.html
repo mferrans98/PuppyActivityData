@@ -271,7 +271,7 @@ $(document).ready(function () {
 
 <p>ACTIVITY MONITOR DATA (Updated 20211026)</p>
 <pre class="r"><code>knitr::opts_chunk$set(echo = TRUE, 
-                      eval = FALSE)</code></pre>
+                        eval = TRUE)</code></pre>
 <div id="data-setup" class="section level2">
 <h2>#DATA SETUP</h2>
 <p>Load packages and import data</p>
@@ -281,10 +281,9 @@ library(dplyr)
 library(clock)
 library(lubridate)
 library(hms)
+load(file = &quot;activitygraphsenv.RData&quot;)</code></pre>
+<pre class="r"><code>##IMPORT the data
 setwd(&#39;~/Desktop&#39;)
-
-
-##IMPORT the data
 sheets &lt;- readxl::excel_sheets(&#39;puppies2.xlsx&#39;)
 activity_df &lt;- do.call(rbind, lapply(sheets, function(X) transform(readxl::read_excel(&#39;puppies2.xlsx&#39;, sheet = X), sheetname = X)))
 activity_df&lt;-activity_df %&gt;% mutate(time=as_hms(activity_df$Time)) %&gt;% na.omit() %&gt;%  select(-sheetname,-Time)
@@ -469,16 +468,18 @@ newdf$intervaltime&lt;-strftime(newdf$intervaltime2, &#39;%H:%M&#39;)</code></pr
 <p>For each puppy, find an average of activity for each 5 minute interval (make one mean activity count for each interval)</p>
 <pre class="r"><code>intervaldf&lt;-newdf %&gt;% 
      group_by(intervaltime,weeksold,name,rearing,sex) %&gt;% 
-   summarise(interval_avg_activity=mean(activity_counts))
-
-intervaldf2&lt;-newdf %&gt;% 
+   summarise(interval_avg_activity=mean(activity_counts))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;intervaltime&#39;, &#39;weeksold&#39;, &#39;name&#39;, &#39;rearing&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>intervaldf2&lt;-newdf %&gt;% 
      group_by(intervaltime,Date,weeksold,name,rearing,sex) %&gt;% 
    summarise(interval_avg_activity=mean(activity_counts))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;intervaltime&#39;, &#39;Date&#39;, &#39;weeksold&#39;, &#39;name&#39;, &#39;rearing&#39;. You can override using the `.groups` argument.</code></pre>
 <p>Deviance from weekly means (for each puppy) for each (5 min interval) data point (creates indiv_weekly_dev df)</p>
 <pre class="r"><code>#means for each puppy for each week of age
 weeklymeanforage_bypuppy&lt;-intervaldf %&gt;% group_by(name, weeksold) %&gt;% 
-  summarize(&quot;weeklymeanforage_bypuppy&quot;=mean(interval_avg_activity), N=n()) 
-# merge two data frames: weekly mean for each puppy and hourly mean
+  summarize(&quot;weeklymeanforage_bypuppy&quot;=mean(interval_avg_activity), N=n()) </code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;name&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code># merge two data frames: weekly mean for each puppy and hourly mean
 #places each weekly mean next to its corresponding interval data point
 indiv_weekly_dev&lt;- merge(intervaldf,weeklymeanforage_bypuppy,by=c(&quot;name&quot;,&quot;weeksold&quot;))
 #deviance from the weekly mean (for each puppy) for each (5 min interval) data point 
@@ -488,6 +489,7 @@ indiv_weekly_dev&lt;-indiv_weekly_dev %&gt;% mutate(meandeviance=(interval_avg_a
      group_by(intervaltime,weeksold) %&gt;% 
    summarise(interval_avg_deviance=mean(meandeviance),
              interval_weekly_avg=mean(interval_avg_activity))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;intervaltime&#39;. You can override using the `.groups` argument.</code></pre>
 <table style="width:6%;">
 <colgroup>
 <col width="5%" />
@@ -516,21 +518,23 @@ indiv_weekly_dev&lt;-indiv_weekly_dev %&gt;% mutate(meandeviance=(interval_avg_a
 <pre class="r"><code>#Leo, 8 weeks
 ggplot(subset(indiv_weekly_dev,weeksold==&quot;8&quot; &amp; name==&quot;Leo&quot;), aes(x=intervaltime, y=meandeviance, group=1)) + ylim(-500,2500) + geom_line() + ggtitle(&quot;Leo: 8 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) +
   scale_x_discrete(breaks=hours_list)</code></pre>
-<p>GRAPH OF MEAN DEVIANCE (GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK</p>
+<p><img src="code_files/figure-html/unnamed-chunk-16-1.png" width="672" /> GRAPH OF MEAN DEVIANCE (GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK</p>
 <pre class="r"><code>ggplot(subset(indiv_weekly_dev,weeksold==&quot;8&quot;), aes(x=intervaltime, y=meandeviance, group=&#39;name&#39;)) + geom_line(aes(colour=name)) + ggtitle(&quot;Mean Deviance: 8 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Deviance&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
-<p>COMPARE TWO PUPPIES’ MEAN DEVIANCE FOR 1 SPECIFIC WEEK</p>
+<p><img src="code_files/figure-html/unnamed-chunk-17-1.png" width="672" /> COMPARE TWO PUPPIES’ MEAN DEVIANCE FOR 1 SPECIFIC WEEK</p>
 <pre class="r"><code>ggplot(subset(indiv_weekly_dev,name==&quot;Rainbow&quot;|name==&quot;Stanley&quot;&amp;weeksold==12), aes(x=intervaltime, y=meandeviance, group=name)) + geom_line(aes(colour=name)) + ggtitle(&quot;Mean Deviance: 12 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Deviance&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
-<p>GROUP AVG FOR 1 INDIVIDUAL WEEK</p>
+<p><img src="code_files/figure-html/unnamed-chunk-18-1.png" width="672" /> GROUP AVG FOR 1 INDIVIDUAL WEEK</p>
 <pre class="r"><code>#8 weeks
 ggplot(subset(weeklyintervaldf,weeksold==&quot;8&quot;), aes(x=intervaltime, y=interval_avg_deviance, group=1)) + geom_line() + ggtitle(&quot;Group: 8 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
-<p>GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP MEAN DEVIANCE)</p>
+<p><img src="code_files/figure-html/unnamed-chunk-19-1.png" width="672" /> GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP MEAN DEVIANCE)</p>
 <pre class="r"><code>ggplot(weeklyintervaldf, aes(x=intervaltime, y=interval_avg_deviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8-20 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
-<p>GRAPHS OF ALL WEEKS FOR 1 INDIVIDUAL PUPPY</p>
+<p><img src="code_files/figure-html/unnamed-chunk-20-1.png" width="672" /> GRAPHS OF ALL WEEKS FOR 1 INDIVIDUAL PUPPY</p>
 <pre class="r"><code>ggplot(subset(indiv_weekly_dev,name==&quot;Rainbow&quot;), aes(x=intervaltime, y=meandeviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Rainbow: 8-20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
 <p>GRAPHS OF GROUP DEVIANCE: 8 VS 20 WEEKS</p>
 <pre class="r"><code>ggplot((subset(weeklyintervaldf,weeksold==&quot;8&quot; | weeksold==&quot;20&quot;)), aes(x=intervaltime, y=interval_avg_deviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8 vs. 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Activity Counts (mean deviance)&quot;) +ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
-<p>GRAPHS OF GROUP DEVIANCE: 8, 14, &amp; 20 WEEKS</p>
+<p><img src="code_files/figure-html/unnamed-chunk-22-1.png" width="672" /> GRAPHS OF GROUP DEVIANCE: 8, 14, &amp; 20 WEEKS</p>
 <pre class="r"><code>ggplot((subset(weeklyintervaldf,weeksold==&quot;8&quot; | weeksold==&quot;14&quot;| weeksold==&quot;20&quot;)), aes(x=intervaltime, y=interval_avg_deviance, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8, 14, &amp; 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Activity Counts (mean deviance)&quot;) +ylab(&quot;Activity Counts (mean deviance)&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
 </div>
 <div id="mean-activity-count-graphs-raw-mean-activity-not-deviance" class="section level2">
 <h2>#MEAN ACTIVITY COUNT GRAPHS (raw mean activity, not deviance)</h2>
@@ -539,25 +543,26 @@ ggplot(subset(weeklyintervaldf,weeksold==&quot;8&quot;), aes(x=intervaltime, y=i
 #can add ylim(-500,2500)
 ggplot(subset(intervaldf,weeksold==&quot;8&quot; &amp; name==&quot;Sassy&quot;), aes(x=intervaltime, y=interval_avg_activity, group=1)) + geom_line() + ggtitle(&quot;Arthur: 8 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) +
   scale_x_discrete(breaks=hours_list)</code></pre>
-<p>GRAPH OF RAW (MEAN) ACTIVITY COUNTS GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK</p>
-<pre class="r"><code>ggplot(subset(intervaldf,weeksold==&quot;8&quot;), aes(x=intervaltime, y=interval_avg_activity, group=&#39;name&#39;)) + geom_line(aes(colour=name)) + ggtitle(&quot;Group Activity Counts: 8 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)
-
-ggplot(subset(intervaldf,weeksold==&quot;18&quot;), aes(x=intervaltime, y=interval_avg_activity, group=&#39;name&#39;)) + geom_line(aes(colour=name)) + ggtitle(&quot;Group Activity Counts: 18 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
-<p>COMPARE TWO PUPPIES’ RAW MEAN ACTIVITY COUNTS FOR 1 SPECIFIC WEEK</p>
+<p><img src="code_files/figure-html/unnamed-chunk-24-1.png" width="672" /> GRAPH OF RAW (MEAN) ACTIVITY COUNTS GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK</p>
+<pre class="r"><code>ggplot(subset(intervaldf,weeksold==&quot;8&quot;), aes(x=intervaltime, y=interval_avg_activity, group=&#39;name&#39;)) + geom_line(aes(colour=name)) + ggtitle(&quot;Group Activity Counts: 8 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(subset(intervaldf,weeksold==&quot;18&quot;), aes(x=intervaltime, y=interval_avg_activity, group=&#39;name&#39;)) + geom_line(aes(colour=name)) + ggtitle(&quot;Group Activity Counts: 18 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-25-2.png" width="672" /> COMPARE TWO PUPPIES’ RAW MEAN ACTIVITY COUNTS FOR 1 SPECIFIC WEEK</p>
 <pre class="r"><code>###graph is now fixed!
 ggplot(subset(intervaldf,name==&quot;Sassy&quot;&amp;weeksold==8|name==&quot;Arthur&quot;&amp;weeksold==8), aes(x=intervaltime, y=interval_avg_activity, group=name)) + geom_line(aes(colour=name)) + ggtitle(&quot;Mean Activity Counts: 8 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
-<p>GROUP AVG OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL WEEK</p>
+<p><img src="code_files/figure-html/unnamed-chunk-26-1.png" width="672" /> GROUP AVG OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL WEEK</p>
 <pre class="r"><code>#8 weeks
-ggplot(subset(weeklyintervaldf,weeksold==&quot;8&quot;), aes(x=intervaltime, y=interval_weekly_avg, group=1)) + geom_line() + ggtitle(&quot;Group: 8 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)
-
-#20 weeks
+ggplot(subset(weeklyintervaldf,weeksold==&quot;8&quot;), aes(x=intervaltime, y=interval_weekly_avg, group=1)) + geom_line() + ggtitle(&quot;Group: 8 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-27-1.png" width="672" /></p>
+<pre class="r"><code>#20 weeks
 ggplot(subset(weeklyintervaldf,weeksold==&quot;20&quot;), aes(x=intervaltime, y=interval_weekly_avg, group=1)) + geom_line() + ggtitle(&quot;Group: 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
-<p>GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP RAW MEAN ACTIVITY COUNTS)</p>
+<p><img src="code_files/figure-html/unnamed-chunk-27-2.png" width="672" /> GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP RAW MEAN ACTIVITY COUNTS)</p>
 <pre class="r"><code>ggplot(weeklyintervaldf, aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8-20 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
-<p>GRAPHS OF GROUP: 8 VS 20 WEEKS (RAW MEAN ACTIVITY COUNTS)</p>
+<p><img src="code_files/figure-html/unnamed-chunk-28-1.png" width="672" /> GRAPHS OF GROUP: 8 VS 20 WEEKS (RAW MEAN ACTIVITY COUNTS)</p>
 <pre class="r"><code>ggplot((subset(weeklyintervaldf,weeksold==&quot;8&quot; | weeksold==&quot;20&quot;)), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8 vs. 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
-<p>GRAPHS OF GROUP: 8, 14, &amp; 20 WEEKS</p>
+<p><img src="code_files/figure-html/unnamed-chunk-29-1.png" width="672" /> GRAPHS OF GROUP: 8, 14, &amp; 20 WEEKS</p>
 <pre class="r"><code>ggplot((subset(weeklyintervaldf,weeksold==&quot;8&quot; | weeksold==&quot;14&quot;| weeksold==&quot;20&quot;)), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8, 14, &amp; 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
 <table style="width:6%;">
 <colgroup>
 <col width="5%" />
@@ -611,7 +616,13 @@ ggplot(subset(weeklyintervaldf,weeksold==&quot;20&quot;), aes(x=intervaltime, y=
 <td>view(sleepbout_weeklyavg_bypuppy) ``` Compare home vs. DPK pups</td>
 </tr>
 <tr class="odd">
-<td><code>r sleepbout_weeklyavg_rearing &lt;- sleepbout_weeklyavg_bypuppy %&gt;% group_by(weeksold,state,rearing) %&gt;% summarize(Mean_mins=mean(Mean_mins), N=n(),Total_mins=sum(Total_mins)) sleepbout_weeklyavg_rearing$weeksold&lt;-as.numeric(as.character(sleepbout_weeklyavg_rearing$weeksold))</code></td>
+<td><code>r sleepbout_weeklyavg_rearing &lt;- sleepbout_weeklyavg_bypuppy %&gt;% group_by(weeksold,state,rearing) %&gt;% summarize(Mean_mins=mean(Mean_mins), N=n(),Total_mins=sum(Total_mins))</code></td>
+</tr>
+<tr class="even">
+<td><code>## `summarise()` has grouped output by 'weeksold', 'state'. You can override using the `.groups` argument.</code></td>
+</tr>
+<tr class="odd">
+<td><code>r sleepbout_weeklyavg_rearing$weeksold&lt;-as.numeric(as.character(sleepbout_weeklyavg_rearing$weeksold))</code></td>
 </tr>
 <tr class="even">
 <td>Without collapsing across days:</td>
@@ -653,27 +664,29 @@ ggplot(subset(weeklyintervaldf,weeksold==&quot;20&quot;), aes(x=intervaltime, y=
 <h2>#PLOTTING REST/WAKE BOUTS</h2>
 <p>Compare average rest/wake bout durations in 1 individual week</p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,weeksold==&quot;20&quot;), aes(x=state, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle(&quot;Average Sleep/Awake Bout Duration: 20 weeks&quot;) + xlab(&quot;State&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;State&quot;)</code></pre>
-<p>Compare average rest/awake bout durations for each week</p>
-<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;awake&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Avg Duration of Awake Bouts by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)
-
-ggplot(subset(sleepbout_weeklyavg,state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Avg Duration of Rest Bouts by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
-<p>Total Minutes of Rest by Week</p>
+<p><img src="code_files/figure-html/unnamed-chunk-36-1.png" width="672" /> Compare average rest/awake bout durations for each week</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;awake&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Avg Duration of Awake Bouts by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-37-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Avg Duration of Rest Bouts by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-37-2.png" width="672" /> Total Minutes of Rest by Week</p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;rest&quot;), aes(x=weeksold, y=Total_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Average Total Rest by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Total Rest (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
-<p>AVG REST HOME VS. DPK</p>
+<p><img src="code_files/figure-html/unnamed-chunk-38-1.png" width="672" /> AVG REST HOME VS. DPK</p>
 <pre class="r"><code>weeks&lt;-c(8:20)
 
-ggplot(subset(sleepbout_weeklyavg_rearing,state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle(&quot;Avg Duration of Rest Bouts by Week: Home vs. DPK&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Avg State Duration (min)&quot;) + labs(colour = &quot;Rearing&quot;) + scale_x_continuous(breaks=weeks)
-
-ggplot(subset(sleepbout_weeklyavg_rearing,state==&quot;rest&quot;), aes(x=weeksold, y=Total_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle(&quot;Average Total Rest by Week: Home vs. DPK&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Rest (mins)&quot;) + labs(colour = &quot;Rearing&quot;) + scale_x_continuous(breaks=weeks)</code></pre>
+ggplot(subset(sleepbout_weeklyavg_rearing,state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle(&quot;Avg Duration of Rest Bouts by Week: Home vs. DPK&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Avg State Duration (min)&quot;) + labs(colour = &quot;Rearing&quot;) + scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-39-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_rearing,state==&quot;rest&quot;), aes(x=weeksold, y=Total_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle(&quot;Average Total Rest by Week: Home vs. DPK&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Rest (mins)&quot;) + labs(colour = &quot;Rearing&quot;) + scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-39-2.png" width="672" /></p>
 </div>
 <div id="by-puppy" class="section level2">
 <h2>#BY PUPPY</h2>
 <p>Bar graph: Mean State Duration for 1 puppy by weeks</p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, name==&quot;Leo&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle(&quot;Leo: Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
-<p>Line graph: Mean State Duration for 1 puppy by weeks</p>
+<p><img src="code_files/figure-html/unnamed-chunk-40-1.png" width="672" /> Line graph: Mean State Duration for 1 puppy by weeks</p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, name==&quot;Leo&quot;), aes(x=weeksold, y=Mean_mins, group=state))+ geom_line(aes(colour=state)) + ggtitle(&quot;Leo: Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
-<p>Line graph: mean rest state duration by week for each puppy</p>
+<p><img src="code_files/figure-html/unnamed-chunk-41-1.png" width="672" /> Line graph: mean rest state duration by week for each puppy</p>
 <pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins, group=name))+ geom_line(aes(colour=name)) + ggtitle(&quot;Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="code_files/figure-html/unnamed-chunk-42-1.png" width="672" /></p>
 </div>
 <div id="export" class="section level2">
 <h2>#EXPORT</h2>

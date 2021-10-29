@@ -18,20 +18,22 @@ library(dplyr)
 library(clock)
 library(lubridate)
 library(hms)
-setwd('~/Desktop')
+library(ggplot2)
+load(file = "activitygraphsenv.RData")
+```
 
-
+```{r, eval=FALSE}
 ##IMPORT the data
+setwd('~/Desktop')
 sheets <- readxl::excel_sheets('puppies2.xlsx')
 activity_df <- do.call(rbind, lapply(sheets, function(X) transform(readxl::read_excel('puppies2.xlsx', sheet = X), sheetname = X)))
 activity_df<-activity_df %>% mutate(time=as_hms(activity_df$Time)) %>% na.omit() %>%  select(-sheetname,-Time)
 activity_df$Date <- as.Date(activity_df$Date, format= "%Y-%m-%d")
-
-
-
 ```
+
+
 Removing dates where collar is off
-```{r}
+```{r,cache=TRUE, eval=FALSE}
 #removing dates where collar is off
   #Anya
 filtered_dates <- activity_df[!(activity_df$Dog.name == "Anya" & activity_df$Date < "2019-10-02")&!(activity_df$Dog.name == "Anya" & activity_df$Date == "2019-10-16")&!(activity_df$Dog.name == "Anya" & activity_df$Date > "2020-11-18"),]
@@ -82,19 +84,19 @@ filtered_dates <- filtered_dates[!(filtered_dates$Dog.name == "Leo" & filtered_d
 
 ```
 Rename columns
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 #renamecolumns
 filtered_dates<-rename(filtered_dates, "name"=Dog.name)
 filtered_dates<-rename(filtered_dates, activity_counts="Activity.Data")
 ```
 Delete sleeping hours (10pm-8am)
-```{r}
+```{r, cache=TRUE, eval=FALSE}
 #delete sleeping hours (10pm-8am)
 filtered_datetime<- filtered_dates %>% filter(hour(time)>7)
 filtered_datetime<- filtered_datetime %>% filter(hour(time)<23)
 ```
 Adding DOB, weeks old, rearing (home vs DPK), & sex columns 
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 #addingDOB
 newdf<-filtered_datetime %>% mutate(DOB =
                      case_when(name == "Anya" ~ "2019-06-29",
@@ -203,7 +205,7 @@ newdf<-newdf %>% mutate(sex =
 
 ```
 Make hour column 
-```{r}
+```{r, cache=TRUE}
 newdf<-newdf %>% mutate(hour=
                          (hour(time)))
 ```
@@ -212,7 +214,7 @@ Make combined column for date and time
 newdf <- newdf %>% mutate(datetime=as.POSIXct(paste(Date,time), format="%Y-%m-%d %H:%M:%S"))
 ```
 Create 5 minute intervals labels
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 newdf <- newdf %>% mutate(interval=cut(newdf$datetime, breaks = "5 min"))
 newdf <- newdf %>% mutate(intervaltime=as.POSIXct(newdf$interval))
 newdf <- newdf %>% mutate(intervaltime=format(newdf$interval, format = "%H:%M:%S"))
@@ -224,7 +226,7 @@ newdf$intervaltime2<-strptime(newdf$intervaltime, format='%Y-%m-%d %H:%M:%S')
 newdf$intervaltime<-strftime(newdf$intervaltime2, '%H:%M')
 ```
 For each puppy, find an average of activity for each 5 minute interval (make one mean activity count for each interval)
-```{r}
+```{r, cache=TRUE}
 intervaldf<-newdf %>% 
      group_by(intervaltime,weeksold,name,rearing,sex) %>% 
    summarise(interval_avg_activity=mean(activity_counts))
@@ -234,7 +236,7 @@ intervaldf2<-newdf %>%
    summarise(interval_avg_activity=mean(activity_counts))
 ```
 Deviance from weekly means (for each puppy) for each (5 min interval) data point (creates indiv_weekly_dev df)
-```{r}
+```{r, cache=TRUE}
 #means for each puppy for each week of age
 weeklymeanforage_bypuppy<-intervaldf %>% group_by(name, weeksold) %>% 
   summarize("weeklymeanforage_bypuppy"=mean(interval_avg_activity), N=n()) 
@@ -383,7 +385,7 @@ view(sleepbouts)
 ```
 
 Intervals of resting and wakefulness
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 sleepbout_intervals<-sleepbouts %>% 
   group_by(name,weeksold,group) %>% 
   summarise(intervaltime = paste(first(intervaltime), last(intervalend), sep = '-'), 
@@ -405,7 +407,7 @@ view(sleepbout_weeklyavg)
 ```
 
 Calculate rest/wake duration (avg and total) for each puppy for each week, add rearing & sex info
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 sleepbout_weeklyavg_bypuppy <- sleepbout_intervals %>% group_by(weeksold,name,state) %>% 
   summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))
 
@@ -475,7 +477,7 @@ sleepbout_weeklyavg_rearing$weeksold<-as.numeric(as.character(sleepbout_weeklyav
 ```
 
 Without collapsing across days:
-```{r, cache=TRUE}
+```{r, cache=TRUE, eval=FALSE}
 #set threshold for sleeping/awake
 sleepbouts2<-intervaldf2 %>% mutate(state=case_when(interval_avg_activity >= 100 ~ "awake",interval_avg_activity <100 ~ "rest"))
 
