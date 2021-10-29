@@ -1,0 +1,72 @@
+---
+title: "sleepgraphs"
+author: "Morgan Ferrans"
+date: "10/28/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      message = FALSE)
+
+```
+
+```{r}
+library(ggplot2)
+library(dplyr)
+load(file = "activitygraphsenv.RData")
+```
+
+
+# DATA FRAMS
+```{r}
+view(sleepbouts)
+view(sleepbouts2)
+```
+
+
+---
+#PLOTTING REST/WAKE BOUTS
+---
+
+Compare average rest/wake bout durations in 1 individual week
+```{r}
+ggplot(subset(sleepbout_weeklyavg,weeksold=="20"), aes(x=state, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle("Average Sleep/Awake Bout Duration: 20 weeks") + xlab("State")+ ylab("Mean State Duration (min)") + labs(colour = "State")
+```
+Compare average rest/awake bout durations for each week
+```{r}
+ggplot(subset(sleepbout_weeklyavg,state=="awake"), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle("Avg Duration of Awake Bouts by Week") + xlab("Weeks Old")+ ylab("Mean State Duration (min)") + labs(colour = "Age (weeks)")
+
+ggplot(subset(sleepbout_weeklyavg,state=="rest"), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle("Avg Duration of Rest Bouts by Week") + xlab("Weeks Old")+ ylab("Mean State Duration (min)") + labs(colour = "Age (weeks)")
+
+```
+Total Minutes of Rest by Week
+```{r}
+ggplot(subset(sleepbout_weeklyavg,state=="rest"), aes(x=weeksold, y=Total_mins))+ geom_col(aes(fill=weeksold)) + ggtitle("Average Total Rest by Week") + xlab("Weeks Old")+ ylab("Total Rest (min)") + labs(colour = "Age (weeks)")
+```
+AVG REST HOME VS. DPK 
+```{r}
+weeks<-c(8:20)
+
+ggplot(subset(sleepbout_weeklyavg_rearing,state=="rest"), aes(x=weeksold, y=Mean_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle("Avg Duration of Rest Bouts by Week: Home vs. DPK") + xlab("Weeks Old")+ ylab("Avg State Duration (min)") + labs(colour = "Rearing") + scale_x_continuous(breaks=weeks)
+
+ggplot(subset(sleepbout_weeklyavg_rearing,state=="rest"), aes(x=weeksold, y=Total_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle("Average Total Rest by Week: Home vs. DPK") + xlab("Weeks Old")+ ylab("Rest (mins)") + labs(colour = "Rearing") + scale_x_continuous(breaks=weeks)
+```
+
+
+
+  #BY PUPPY
+---
+Bar graph: Mean State Duration for 1 puppy by weeks
+```{r}
+ggplot(subset(sleepbout_weeklyavg_bypuppy, name=="Leo"), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle("Leo: Mean Rest State Duration by Week") + xlab("Weeks Old")+ ylab("Mean State Duration (min)") + labs(colour = "Age (weeks)")+ scale_x_continuous(breaks=weeks)
+```
+Line graph: Mean State Duration for 1 puppy by weeks
+```{r}
+ggplot(subset(sleepbout_weeklyavg_bypuppy, name=="Leo"), aes(x=weeksold, y=Mean_mins, group=state))+ geom_line(aes(colour=state)) + ggtitle("Leo: Mean Rest State Duration by Week") + xlab("Weeks Old")+ ylab("Mean State Duration (min)") + labs(colour = "Age (weeks)")+ scale_x_continuous(breaks=weeks)
+```
+Line graph: mean rest state duration by week for each puppy
+```{r}
+ggplot(subset(sleepbout_weeklyavg_bypuppy, state=="rest"), aes(x=weeksold, y=Mean_mins, group=name))+ geom_line(aes(colour=name)) + ggtitle("Mean Rest State Duration by Week") + xlab("Weeks Old")+ ylab("Mean State Duration (min)") + labs(colour = "Age (weeks)")+ scale_x_continuous(breaks=weeks)
+```
