@@ -274,9 +274,35 @@ $(document).ready(function () {
 </div>
 
 
-<pre class="r"><code>library(ggplot2)
-library(tidyverse)
-load(file = &quot;activitygraphsenv.RData&quot;)</code></pre>
+<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE)</code></pre>
+<pre class="r"><code>library(readxl)    
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.4     ✓ dplyr   1.0.7
+## ✓ tidyr   1.1.3     ✓ stringr 1.4.0
+## ✓ readr   2.0.1     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(dplyr)
+library(clock)
+library(lubridate)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;lubridate&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:clock&#39;:
+## 
+##     as_date</code></pre>
+<pre><code>## The following objects are masked from &#39;package:base&#39;:
+## 
+##     date, intersect, setdiff, union</code></pre>
+<pre class="r"><code>library(hms)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;hms&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:lubridate&#39;:
+## 
+##     hms</code></pre>
+<pre class="r"><code>load(file = &quot;activitygraphsenv.RData&quot;)</code></pre>
 <div id="data-frames" class="section level1">
 <h1>DATA FRAMES</h1>
 <pre class="r"><code>head(sleepbouts)</code></pre>

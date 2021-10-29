@@ -2,20 +2,22 @@
 title: "Sleep Data"
 author: "Morgan Ferrans"
 date: "10/28/2021"
-output:
-  html_document: rmarkdown::github_document
+output: html_document  
+ 
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,
-                      warning = FALSE,
-                      message = FALSE)
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
 ```{r}
-library(ggplot2)
+library(readxl)    
 library(tidyverse)
+library(dplyr)
+library(clock)
+library(lubridate)
+library(hms)
 load(file = "activitygraphsenv.RData")
 ```
 

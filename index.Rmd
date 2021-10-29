@@ -22,9 +22,11 @@ output: html_document
 </div>
 <div class="col-sm-6">
 
-### [DPK Puppy Activity Data](https://mferrans98.github.io/PuppyActivityData/index.html)
-
 <a href = "https://mferrans98.github.io/PuppyActivityData/index.html">
 !
 </a>
 </div>
+
+
+
+
