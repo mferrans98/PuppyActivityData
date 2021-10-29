@@ -19,7 +19,7 @@ load(file = "activitygraphsenv.RData")
 ```
 
 
-# DATA FRAMS
+# DATA FRAMES
 ```{r}
 view(sleepbouts)
 view(sleepbouts2)
