@@ -253,7 +253,7 @@ $(document).ready(function () {
   <a href="activitygraphs.html">Activity Graphs</a>
 </li>
 <li>
-  <a href="sleepdata.html">Sleep Data</a>
+  <a href="sleepdata.html">SleepData</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -274,8 +274,13 @@ $(document).ready(function () {
 </div>
 
 
+<pre class="r"><code>library(ggplot2)
+library(tidyverse)
+load(file = &quot;activitygraphsenv.RData&quot;)</code></pre>
 <div id="data-frames" class="section level1">
 <h1>DATA FRAMES</h1>
+<pre class="r"><code>view(sleepbouts)
+view(sleepbouts2)</code></pre>
 <table>
 <tbody>
 <tr class="odd">
@@ -283,10 +288,30 @@ $(document).ready(function () {
 </tr>
 </tbody>
 </table>
-<p>Compare average rest/wake bout durations in 1 individual week <img src="sleepdata_files/figure-html/unnamed-chunk-3-1.png" width="672" /> Compare average rest/awake bout durations for each week <img src="sleepdata_files/figure-html/unnamed-chunk-4-1.png" width="672" /><img src="sleepdata_files/figure-html/unnamed-chunk-4-2.png" width="672" /> Total Minutes of Rest by Week <img src="sleepdata_files/figure-html/unnamed-chunk-5-1.png" width="672" /> AVG REST HOME VS. DPK <img src="sleepdata_files/figure-html/unnamed-chunk-6-1.png" width="672" /><img src="sleepdata_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<p>Compare average rest/wake bout durations in 1 individual week</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,weeksold==&quot;20&quot;), aes(x=state, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle(&quot;Average Sleep/Awake Bout Duration: 20 weeks&quot;) + xlab(&quot;State&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;State&quot;)</code></pre>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-3-1.png" width="672" /> Compare average rest/awake bout durations for each week</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;awake&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Avg Duration of Awake Bouts by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Avg Duration of Rest Bouts by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-4-2.png" width="672" /> Total Minutes of Rest by Week</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg,state==&quot;rest&quot;), aes(x=weeksold, y=Total_mins))+ geom_col(aes(fill=weeksold)) + ggtitle(&quot;Average Total Rest by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Total Rest (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)</code></pre>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-5-1.png" width="672" /> AVG REST HOME VS. DPK</p>
+<pre class="r"><code>weeks&lt;-c(8:20)
+
+ggplot(subset(sleepbout_weeklyavg_rearing,state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle(&quot;Avg Duration of Rest Bouts by Week: Home vs. DPK&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Avg State Duration (min)&quot;) + labs(colour = &quot;Rearing&quot;) + scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_rearing,state==&quot;rest&quot;), aes(x=weeksold, y=Total_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle(&quot;Average Total Rest by Week: Home vs. DPK&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Rest (mins)&quot;) + labs(colour = &quot;Rearing&quot;) + scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
 <div id="by-puppy" class="section level2">
 <h2>#BY PUPPY</h2>
-<p>Bar graph: Mean State Duration for 1 puppy by weeks <img src="sleepdata_files/figure-html/unnamed-chunk-7-1.png" width="672" /> Line graph: Mean State Duration for 1 puppy by weeks <img src="sleepdata_files/figure-html/unnamed-chunk-8-1.png" width="672" /> Line graph: mean rest state duration by week for each puppy <img src="sleepdata_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>Bar graph: Mean State Duration for 1 puppy by weeks</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, name==&quot;Leo&quot;), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle(&quot;Leo: Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-7-1.png" width="672" /> Line graph: Mean State Duration for 1 puppy by weeks</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, name==&quot;Leo&quot;), aes(x=weeksold, y=Mean_mins, group=state))+ geom_line(aes(colour=state)) + ggtitle(&quot;Leo: Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-8-1.png" width="672" /> Line graph: mean rest state duration by week for each puppy</p>
+<pre class="r"><code>ggplot(subset(sleepbout_weeklyavg_bypuppy, state==&quot;rest&quot;), aes(x=weeksold, y=Mean_mins, group=name))+ geom_line(aes(colour=name)) + ggtitle(&quot;Mean Rest State Duration by Week&quot;) + xlab(&quot;Weeks Old&quot;)+ ylab(&quot;Mean State Duration (min)&quot;) + labs(colour = &quot;Age (weeks)&quot;)+ scale_x_continuous(breaks=weeks)</code></pre>
+<p><img src="sleepdata_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>
 </div>
 
