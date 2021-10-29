@@ -6,12 +6,12 @@ output: html_document
  
 ---
 
-```{r setup, include=TRUE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
 
 ```
 
-```{r}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(readxl)    
 library(tidyverse)
 library(dplyr)
@@ -24,8 +24,8 @@ load(file = "activitygraphsenv.RData")
 
 # DATA FRAMES
 ```{r}
-head(sleepbouts)
-head(sleepbouts2)
+view(sleepbouts)
+view(sleepbouts2)
 ```
 
 

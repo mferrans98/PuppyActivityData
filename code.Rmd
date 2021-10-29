@@ -5,7 +5,7 @@ output:
 ACTIVITY MONITOR DATA (Updated 20211026)
 ```{r}
 knitr::opts_chunk$set(echo = TRUE, 
-                      eval = FALSE)
+                        eval = TRUE)
 ```
  
 #DATA SETUP
@@ -82,7 +82,7 @@ filtered_dates <- filtered_dates[!(filtered_dates$Dog.name == "Leo" & filtered_d
 
 ```
 Rename columns
-```{r}
+```{r, cache=TRUE}
 #renamecolumns
 filtered_dates<-rename(filtered_dates, "name"=Dog.name)
 filtered_dates<-rename(filtered_dates, activity_counts="Activity.Data")
@@ -94,7 +94,7 @@ filtered_datetime<- filtered_dates %>% filter(hour(time)>7)
 filtered_datetime<- filtered_datetime %>% filter(hour(time)<23)
 ```
 Adding DOB, weeks old, rearing (home vs DPK), & sex columns 
-```{r}
+```{r, cache=TRUE}
 #addingDOB
 newdf<-filtered_datetime %>% mutate(DOB =
                      case_when(name == "Anya" ~ "2019-06-29",
@@ -208,11 +208,11 @@ newdf<-newdf %>% mutate(hour=
                          (hour(time)))
 ```
 Make combined column for date and time
-```{r}
+```{r, cache=TRUE}
 newdf <- newdf %>% mutate(datetime=as.POSIXct(paste(Date,time), format="%Y-%m-%d %H:%M:%S"))
 ```
 Create 5 minute intervals labels
-```{r}
+```{r, cache=TRUE}
 newdf <- newdf %>% mutate(interval=cut(newdf$datetime, breaks = "5 min"))
 newdf <- newdf %>% mutate(intervaltime=as.POSIXct(newdf$interval))
 newdf <- newdf %>% mutate(intervaltime=format(newdf$interval, format = "%H:%M:%S"))
@@ -405,7 +405,7 @@ view(sleepbout_weeklyavg)
 ```
 
 Calculate rest/wake duration (avg and total) for each puppy for each week, add rearing & sex info
-```{r}
+```{r, cache=TRUE}
 sleepbout_weeklyavg_bypuppy <- sleepbout_intervals %>% group_by(weeksold,name,state) %>% 
   summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))
 
@@ -469,7 +469,7 @@ sleepbout_weeklyavg_bypuppy$weeksold<-as.numeric(as.character(sleepbout_weeklyav
 view(sleepbout_weeklyavg_bypuppy)
 ```
 Compare home vs. DPK pups
-```{r}
+```{r, cache=TRUE}
 sleepbout_weeklyavg_rearing <- sleepbout_weeklyavg_bypuppy %>% group_by(weeksold,state,rearing) %>% summarize(Mean_mins=mean(Mean_mins), N=n(),Total_mins=sum(Total_mins)) 
 sleepbout_weeklyavg_rearing$weeksold<-as.numeric(as.character(sleepbout_weeklyavg_rearing$weeksold))
 ```
