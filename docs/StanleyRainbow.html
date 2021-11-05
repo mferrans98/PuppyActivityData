@@ -11,7 +11,7 @@
 
 
 
-<title>Puppy Activity Data</title>
+<title>StanleyRainbow.knit</title>
 
 <script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -268,30 +268,102 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Puppy Activity Data</h1>
 
 </div>
 
 
-<hr />
-<style type="text/css">
-.title {
-  display: none;
-}
+<pre class="r"><code>library(dplyr)
+library(clock)
+library(lubridate)
+library(hms)
+Rainbow_Stanley_sleepbouts&lt;-sleepbouts_200_full %&gt;% filter((name==&quot;Stanley&quot;|name==&quot;Rainbow&quot;)) %&gt;% select(-group) %&gt;% 
+  group_by(name,weeksold, Date) %&gt;% 
+  arrange(intervaltime) %&gt;% 
+  mutate (group = data.table::rleid(state))
 
-#getting-started img {
-  margin-right: 10px;
-}
+library(lubridate)
+Rainbow_Stanley_intervals&lt;-Rainbow_Stanley_sleepbouts %&gt;% 
+  group_by(name,weeksold,Date,group) %&gt;% 
+  summarise(intervaltime = paste(first(intervaltime), last(intervalend), sep = &#39;-&#39;), 
+            state = first(state), 
+            timeperiod = last(timeperiod_end) - first(timeperiod)) %&gt;% mutate(timeperiod_secs=time_length(timeperiod),
+                                     timeperiod_mins=timeperiod_secs/60) %&gt;% 
+  select(-timeperiod_secs)</code></pre>
+<pre><code>## Note: method with signature &#39;Period#ANY&#39; chosen for function &#39;-&#39;,
+##  target signature &#39;Period#Period&#39;.
+##  &quot;ANY#Period&quot; would also be valid</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;name&#39;, &#39;weeksold&#39;, &#39;Date&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>view(sleepbout_intervals)
 
-</style>
-<div class="row" style="padding-top: 30px;">
-<div id="puppy-activity-data" class="section level1 col-sm-6">
-<h1><strong>Puppy Activity Data</strong></h1>
-<p>Full code:</p>
-</div>
-<div class="col-sm-6">
-<p><a href = "https://mferrans98.github.io/PuppyActivityData/index.html"> ! </a></p>
-</div>
+#Find average &amp; total length of rest vs awake states for each week
+Rainbow_Stanley_weeklyavg &lt;- Rainbow_Stanley_intervals%&gt;% group_by(name, weeksold,state) %&gt;% 
+  summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;name&#39;, &#39;weeksold&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>view(Rainbow_Stanley_weeklyavg)
+
+
+#create 10 minute interval labels
+Rainbow_Stanley_intervals_10min&lt;-Rainbow_Stanley_sleepbouts %&gt;%
+  mutate(intervaltime=as.character(intervaltime)) %&gt;% 
+   select(-state,-group,-intervalend,-timeperiod,-timeperiod_end)
+ 
+Rainbow_Stanley_intervals_10min &lt;- Rainbow_Stanley_intervals_10min %&gt;% mutate(datetime=as.POSIXct(paste(Date,intervaltime), format=&quot;%Y-%m-%d %H:%M&quot;))%&gt;% 
+  mutate(interval=cut(datetime, breaks = &quot;10 min&quot;))%&gt;%
+  mutate(intervaltime2=as.POSIXct(interval))%&gt;% 
+  mutate(intervaltime2=format(interval, format = &quot;%H:%M:%S&quot;)) %&gt;% mutate(intervaltime2=strptime(intervaltime2, format=&#39;%Y-%m-%d %H:%M:%S&#39;)) %&gt;% mutate(intervaltime2=strftime(intervaltime2, &#39;%H:%M&#39;)) %&gt;% 
+  select(-interval,-datetime)
+
+#For each puppy, find an average of activity for each 5 minute interval (make one mean activity count for each interval)
+ Rainbow_Stanley_intervals_10min &lt;-Rainbow_Stanley_intervals_10min %&gt;% 
+   select(-intervaltime) %&gt;% 
+   group_by(intervaltime2,weeksold,name,Date,rearing,sex) %&gt;% 
+   summarise(interval_avg_activity=mean(interval_avg_activity))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;intervaltime2&#39;, &#39;weeksold&#39;, &#39;name&#39;, &#39;Date&#39;, &#39;rearing&#39;. You can override using the `.groups` argument.</code></pre>
+<p>Calc sleepbouts</p>
+<pre class="r"><code>library(lubridate)
+#set threshold for sleeping/awake
+sleepbouts_RainbowStanley&lt;-Rainbow_Stanley_intervals_10min %&gt;% mutate(state=case_when(interval_avg_activity &gt;= 100 ~ &quot;awake&quot;,interval_avg_activity &lt;100 ~ &quot;rest&quot;))%&gt;% 
+  mutate(intervaltime2=as.POSIXct(intervaltime2, format=&quot;%H:%M&quot;))%&gt;% 
+  mutate(intervalend=(intervaltime2+(10*60)))%&gt;% 
+  mutate(intervalend=strftime(intervalend, format=&quot;%H:%M&quot;)) %&gt;% 
+  mutate(intervaltime=strftime(intervaltime2, format=&quot;%H:%M&quot;)) %&gt;% group_by(intervaltime) %&gt;% 
+  select(-intervaltime2) 
+
+#assign group numbers to unique sleep periods
+sleepbouts_RainbowStanley&lt;-sleepbouts_RainbowStanley %&gt;% 
+  mutate(timeperiod = hm(intervaltime),
+         timeperiod_end = hm(intervalend)) %&gt;%
+  group_by(name,weeksold) %&gt;% 
+  arrange(Date,name, intervaltime) %&gt;% 
+  mutate (group = data.table::rleid(state))
+
+view(sleepbouts_RainbowStanley)
+
+#Intervals of resting and wakefulness for each **DAY**
+sleepbout_intervals_RainbowStanley&lt;-sleepbouts_RainbowStanley %&gt;% 
+  group_by(name,Date,weeksold,group) %&gt;% 
+  summarise(intervaltime = paste(first(intervaltime), last(intervalend), sep = &#39;-&#39;), 
+            state = first(state), 
+            timeperiod = last(timeperiod_end) - first(timeperiod))%&gt;% 
+  mutate(timeperiod_secs=time_length(timeperiod),
+                                     timeperiod_mins=timeperiod_secs/60) %&gt;% select(-timeperiod_secs)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;name&#39;, &#39;Date&#39;, &#39;weeksold&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>#collapse to get average in each interval per day
+sleepbout_intervals2_collapsed_bypuppy&lt;-sleepbout_intervals2 %&gt;% group_by(weeksold,name,intervaltime,state, Date) %&gt;%summarise(interval_avg_activity=mean(timeperiod_mins))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;weeksold&#39;, &#39;name&#39;, &#39;intervaltime&#39;, &#39;state&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>#collapse to get average in each interval per week
+sleepbout_intervals_weekly_RainbowStanley&lt;-sleepbout_intervals_RainbowStanley %&gt;% group_by(weeksold,name,state) %&gt;%summarise(interval_avg_activity=mean(timeperiod_mins))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;weeksold&#39;, &#39;name&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>###
+
+sleepbout_intervals2_collapsed&lt;-sleepbout_intervals2 %&gt;% group_by(weeksold,intervaltime,state) %&gt;%summarise(interval_avg_activity=mean(timeperiod_mins))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;weeksold&#39;, &#39;intervaltime&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>sleepbout_weeklyavg2 &lt;- sleepbout_intervals2 %&gt;% group_by(weeksold,state) %&gt;%
+  summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;weeksold&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>sleepbout_weeklyavg_bypuppy2 &lt;- sleepbout_intervals2 %&gt;% group_by(weeksold,name,state) %&gt;% 
+  summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;weeksold&#39;, &#39;name&#39;. You can override using the `.groups` argument.</code></pre>
 
 
 

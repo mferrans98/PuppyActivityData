@@ -249,7 +249,10 @@ $(document).ready(function () {
   <a href="code.html">Full Code</a>
 </li>
 <li>
-  <a href="activitygraphs.html">Activity Graphs</a>
+  <a href="activitycountgraphs.html">Activity Graphs</a>
+</li>
+<li>
+  <a href="meandeviancegraphs.html">Mean Deviance Activity Graphs</a>
 </li>
 <li>
   <a href="sleepdata.html">Sleep</a>
@@ -275,16 +278,8 @@ $(document).ready(function () {
 
 <p>#PLOTTING ACTIVITY Setup —</p>
 <pre class="r"><code>library(ggplot2)
-library(dplyr)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
-## 
-##     filter, lag</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     intersect, setdiff, setequal, union</code></pre>
-<pre class="r"><code>load(file = &quot;activitygraphsenv.RData&quot;)
+library(dplyr)
+load(file = &quot;activitygraphsenv.RData&quot;)
 weeklyintervaldf$weeksold&lt;-as.factor(weeklyintervaldf$weeksold)
 indiv_weekly_dev$weeksold&lt;-as.factor(indiv_weekly_dev$weeksold)</code></pre>
 <p>List of desired hourly time breaks for graph x axis tick marks</p>
