@@ -6,9 +6,9 @@ navbar:
       href: index.html
     - text: "Full Code/Data Setup"
       href: data_setup.html
-    - text: "Activity Graphs"
+    - text: "Activity Count Graphs"
       href: activitycountgraphs.html
-    - text: "Mean Deviance Activity Graphs"
+    - text: "Mean Deviance Graphs"
       href: meandeviancegraphs.html
     - text: "Sleep"
       href: sleepdata.html

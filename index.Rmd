@@ -19,8 +19,6 @@ output: html_document
 
 # **Puppy Activity Data**
 
-Full code:
-
 </div>
 <div class="col-sm-6">
 
