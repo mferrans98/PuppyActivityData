@@ -1,4 +1,9 @@
-
+---
+title: "Stanley Rainbow"
+author: "Morgan Ferrans"
+date: "10/28/2021"
+output: html_document
+---
 ```{r}
 library(dplyr)
 library(clock)

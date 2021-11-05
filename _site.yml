@@ -4,8 +4,8 @@ navbar:
   left:
     - text: "Home"
       href: index.html
-    - text: "Full Code"
-      href: code.html
+    - text: "Full Code/Data Setup"
+      href: data_setup.html
     - text: "Activity Graphs"
       href: activitycountgraphs.html
     - text: "Mean Deviance Activity Graphs"
