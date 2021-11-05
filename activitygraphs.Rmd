@@ -24,7 +24,7 @@ load(file = "activitygraphsenv.RData")
 #### INDIVIDUAL GRAPHS FOR 1 INDIVIDUAL PUPPY FOR 1 INDIVIDUAL WEEK
 ```{r}
 #Leo, 8 weeks
-ggplot(subset(indiv_weekly_dev,weeksold=="8" & name=="Leo"), aes(x=intervaltime, y=meandeviance, group=1)) + ylim(-500,2500) + geom_line() + ggtitle("Leo: 8 weeks") + xlab("Time") + ylab("Activity Counts (mean deviance)") + labs(colour = "Age (weeks)") +
+ggplot(subset(indiv_weekly_dev,weeksold=="16" & name=="Stanley"), aes(x=intervaltime, y=meandeviance, group=1)) + ylim(-500,2500) + geom_line() + ggtitle("Stanley: 16 weeks") + xlab("Time") + ylab("Activity Counts (mean deviance)") + labs(colour = "Age (weeks)") +
   scale_x_discrete(breaks=hours_list)
 ```
 
@@ -35,7 +35,7 @@ ggplot(subset(indiv_weekly_dev,weeksold=="8"), aes(x=intervaltime, y=meandevianc
 
 #### COMPARE TWO PUPPIES' MEAN DEVIANCE FOR 1 SPECIFIC WEEK
 ```{r}
-ggplot(subset(indiv_weekly_dev,name=="Rainbow"|name=="Stanley"&weeksold==12), aes(x=intervaltime, y=meandeviance, group=name)) + geom_line(aes(colour=name)) + ggtitle("Mean Deviance: 12 weeks") + xlab("Time")+ ylab("Mean Deviance") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
+ggplot(subset(indiv_weekly_dev,name=="Rainbow"&weeksold==12|name=="Stanley"&weeksold==12), aes(x=intervaltime, y=meandeviance, group=name)) + geom_line(aes(colour=name)) + ggtitle("Mean Deviance: 12 weeks") + xlab("Time")+ ylab("Mean Deviance") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
 ```
 
 #### GROUP AVG FOR 1 INDIVIDUAL WEEK
@@ -72,7 +72,7 @@ ggplot((subset(weeklyintervaldf,weeksold=="8" | weeksold=="14"| weeksold=="20"))
 ```{r}
 #Arthur, 8 weeks
 #can add ylim(-500,2500)
-ggplot(subset(intervaldf,weeksold=="8" & name=="Sassy"), aes(x=intervaltime, y=interval_avg_activity, group=1)) + geom_line() + ggtitle("Arthur: 8 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") +
+ggplot(subset(intervaldf,weeksold=="16" & name=="Stanley"), aes(x=intervaltime, y=interval_avg_activity, group=1)) + geom_line() + ggtitle("Stanley: 16 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") +
   scale_x_discrete(breaks=hours_list)
 ```
 

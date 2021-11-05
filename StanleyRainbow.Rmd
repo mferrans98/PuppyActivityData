@@ -1,0 +1,94 @@
+
+```{r}
+library(dplyr)
+library(clock)
+library(lubridate)
+library(hms)
+Rainbow_Stanley_sleepbouts<-sleepbouts_200_full %>% filter((name=="Stanley"|name=="Rainbow")) %>% select(-group) %>% 
+  group_by(name,weeksold, Date) %>% 
+  arrange(intervaltime) %>% 
+  mutate (group = data.table::rleid(state))
+
+library(lubridate)
+Rainbow_Stanley_intervals<-Rainbow_Stanley_sleepbouts %>% 
+  group_by(name,weeksold,Date,group) %>% 
+  summarise(intervaltime = paste(first(intervaltime), last(intervalend), sep = '-'), 
+            state = first(state), 
+            timeperiod = last(timeperiod_end) - first(timeperiod)) %>% mutate(timeperiod_secs=time_length(timeperiod),
+                                     timeperiod_mins=timeperiod_secs/60) %>% 
+  select(-timeperiod_secs)
+
+view(sleepbout_intervals)
+
+#Find average & total length of rest vs awake states for each week
+Rainbow_Stanley_weeklyavg <- Rainbow_Stanley_intervals%>% group_by(name, weeksold,state) %>% 
+  summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))
+view(Rainbow_Stanley_weeklyavg)
+
+
+#create 10 minute interval labels
+Rainbow_Stanley_intervals_10min<-Rainbow_Stanley_sleepbouts %>%
+  mutate(intervaltime=as.character(intervaltime)) %>% 
+   select(-state,-group,-intervalend,-timeperiod,-timeperiod_end)
+ 
+Rainbow_Stanley_intervals_10min <- Rainbow_Stanley_intervals_10min %>% mutate(datetime=as.POSIXct(paste(Date,intervaltime), format="%Y-%m-%d %H:%M"))%>% 
+  mutate(interval=cut(datetime, breaks = "10 min"))%>%
+  mutate(intervaltime2=as.POSIXct(interval))%>% 
+  mutate(intervaltime2=format(interval, format = "%H:%M:%S")) %>% mutate(intervaltime2=strptime(intervaltime2, format='%Y-%m-%d %H:%M:%S')) %>% mutate(intervaltime2=strftime(intervaltime2, '%H:%M')) %>% 
+  select(-interval,-datetime)
+
+#For each puppy, find an average of activity for each 5 minute interval (make one mean activity count for each interval)
+ Rainbow_Stanley_intervals_10min <-Rainbow_Stanley_intervals_10min %>% 
+   select(-intervaltime) %>% 
+   group_by(intervaltime2,weeksold,name,Date,rearing,sex) %>% 
+   summarise(interval_avg_activity=mean(interval_avg_activity))
+```
+
+Calc sleepbouts
+```{r}
+library(lubridate)
+#set threshold for sleeping/awake
+sleepbouts_RainbowStanley<-Rainbow_Stanley_intervals_10min %>% mutate(state=case_when(interval_avg_activity >= 100 ~ "awake",interval_avg_activity <100 ~ "rest"))%>% 
+  mutate(intervaltime2=as.POSIXct(intervaltime2, format="%H:%M"))%>% 
+  mutate(intervalend=(intervaltime2+(10*60)))%>% 
+  mutate(intervalend=strftime(intervalend, format="%H:%M")) %>% 
+  mutate(intervaltime=strftime(intervaltime2, format="%H:%M")) %>% group_by(intervaltime) %>% 
+  select(-intervaltime2) 
+
+#assign group numbers to unique sleep periods
+sleepbouts_RainbowStanley<-sleepbouts_RainbowStanley %>% 
+  mutate(timeperiod = hm(intervaltime),
+         timeperiod_end = hm(intervalend)) %>%
+  group_by(name,weeksold) %>% 
+  arrange(Date,name, intervaltime) %>% 
+  mutate (group = data.table::rleid(state))
+
+view(sleepbouts_RainbowStanley)
+
+#Intervals of resting and wakefulness for each **DAY**
+sleepbout_intervals_RainbowStanley<-sleepbouts_RainbowStanley %>% 
+  group_by(name,Date,weeksold,group) %>% 
+  summarise(intervaltime = paste(first(intervaltime), last(intervalend), sep = '-'), 
+            state = first(state), 
+            timeperiod = last(timeperiod_end) - first(timeperiod))%>% 
+  mutate(timeperiod_secs=time_length(timeperiod),
+                                     timeperiod_mins=timeperiod_secs/60) %>% select(-timeperiod_secs)
+
+#collapse to get average in each interval per day
+sleepbout_intervals2_collapsed_bypuppy<-sleepbout_intervals2 %>% group_by(weeksold,name,intervaltime,state, Date) %>%summarise(interval_avg_activity=mean(timeperiod_mins))
+
+#collapse to get average in each interval per week
+sleepbout_intervals_weekly_RainbowStanley<-sleepbout_intervals_RainbowStanley %>% group_by(weeksold,name,state) %>%summarise(interval_avg_activity=mean(timeperiod_mins))
+
+###
+
+sleepbout_intervals2_collapsed<-sleepbout_intervals2 %>% group_by(weeksold,intervaltime,state) %>%summarise(interval_avg_activity=mean(timeperiod_mins))
+
+
+sleepbout_weeklyavg2 <- sleepbout_intervals2 %>% group_by(weeksold,state) %>%
+  summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))
+
+sleepbout_weeklyavg_bypuppy2 <- sleepbout_intervals2 %>% group_by(weeksold,name,state) %>% 
+  summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))
+```
+

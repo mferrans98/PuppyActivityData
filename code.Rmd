@@ -2,7 +2,7 @@
 output:
   html_document: rmarkdown::github_document
 ---
-ACTIVITY MONITOR DATA (Updated 20211026)
+ACTIVITY MONITOR DATA (Updated 20211102)
 ```{r}
 knitr::opts_chunk$set(echo = TRUE, 
                         eval = TRUE)
@@ -283,7 +283,7 @@ ggplot(subset(indiv_weekly_dev,weeksold=="8"), aes(x=intervaltime, y=meandevianc
 ```
 COMPARE TWO PUPPIES' MEAN DEVIANCE FOR 1 SPECIFIC WEEK
 ```{r}
-ggplot(subset(indiv_weekly_dev,name=="Rainbow"|name=="Stanley"&weeksold==12), aes(x=intervaltime, y=meandeviance, group=name)) + geom_line(aes(colour=name)) + ggtitle("Mean Deviance: 12 weeks") + xlab("Time")+ ylab("Mean Deviance") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
+ggplot(subset(indiv_weekly_dev,name=="Rainbow"&weeksold==12|name=="Stanley"&weeksold==12), aes(x=intervaltime, y=meandeviance, group=name)) + geom_line(aes(colour=name)) + ggtitle("Mean Deviance: 12 weeks") + xlab("Time")+ ylab("Mean Deviance") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
 ```
 GROUP AVG FOR 1 INDIVIDUAL WEEK
 ```{r}
@@ -365,6 +365,8 @@ Rest/wake thresholds
 #set threshold for sleeping/awake
 sleepbouts<-indiv_weekly_dev %>% mutate(state=case_when(interval_avg_activity >= 100 ~ "awake",interval_avg_activity <100 ~ "rest"))
 
+sleepbouts_200<-indiv_weekly_dev %>% mutate(state=case_when(interval_avg_activity >= 100 ~ "awake",interval_avg_activity <100 ~ "rest"))
+
 
 #make column for interval end time 
 library(lubridate)
@@ -375,6 +377,19 @@ sleepbouts <-sleepbouts %>% select(-intervaltime2)
 
 #assign group numbers to unique sleep periods
 sleepbouts<-sleepbouts %>% 
+  mutate(timeperiod = hm(intervaltime),
+         timeperiod_end = hm(intervalend)) %>%
+  group_by(name,weeksold) %>% 
+  arrange(intervaltime) %>% 
+  mutate (group = data.table::rleid(state))
+
+#threshold = 200
+sleepbouts_200<-indiv_weekly_dev %>% mutate(state=case_when(interval_avg_activity >= 200 ~ "awake",interval_avg_activity <200 ~ "rest"))
+sleepbouts_200 <-sleepbouts_200 %>% mutate(intervaltime2=as.POSIXct(intervaltime, format="%H:%M"))
+sleepbouts_200 <-sleepbouts_200 %>% mutate(intervalend=(intervaltime2+(5*60)))
+sleepbouts_200 <-sleepbouts_200 %>% mutate(intervalend=strftime(intervalend, format="%H:%M")) 
+sleepbouts_200 <-sleepbouts_200 %>% select(-intervaltime2)
+sleepbouts_200<-sleepbouts_200 %>% 
   mutate(timeperiod = hm(intervaltime),
          timeperiod_end = hm(intervalend)) %>%
   group_by(name,weeksold) %>% 
@@ -413,6 +428,8 @@ sleepbout_weeklyavg_bypuppy <- sleepbout_intervals %>% group_by(weeksold,name,st
 
 sleepbout_weeklyavg_bypuppy$weeksold<-as.character(sleepbout_weeklyavg_bypuppy$weeksold)
 sleepbout_weeklyavg_bypuppy<-sleepbout_weeklyavg_bypuppy %>% mutate(rearing =
+                          sleepbout_weeklyavg_bypuppy2$weeksold<-as.character(sleepbout_weeklyavg_bypuppy2$weeksold)
+sleepbout_weeklyavg_bypuppy2<-sleepbout_weeklyavg_bypuppy2 %>% mutate(rearing =
                           case_when(name == "Anya" ~ "DPK",
                                     name == "Aries" ~ "DPK",
                                     name == "Weston" ~ "DPK",
@@ -420,20 +437,27 @@ sleepbout_weeklyavg_bypuppy<-sleepbout_weeklyavg_bypuppy %>% mutate(rearing =
                                     name == "Yolanda" ~ "DPK",
                                     name == "Zina" ~ "DPK",
                                     name == "Zax" ~ "DPK",
-                                    name == "Arthur" & weeksold <10 ~ "home",
-                                    name == "Arthur" & weeksold >9 ~ "DPK",
-                                    name == "Aurora" & weeksold <10  ~ "home",
-                                    name == "Aurora" & weeksold >9 ~ "DPK",
-                                    name == "Westley" & weeksold <10 ~ "home",
-                                    name == "Westley" & weeksold >9 ~ "DPK",
-                                    name == "Wisdom" & weeksold <10  ~ "home",
-                                    name == "Wisdom" & weeksold >9 ~ "DPK",
-                                    name == "Yonder" & weeksold <10 ~ "home",
-                                    name == "Yonder" & weeksold >9 ~ "DPK",
-                                    name == "Zindel" & weeksold < 10  ~ "home",
-                                    name == "Zindel" & weeksold >9 ~ "DPK",
-                                    name == "Zola" & weeksold <10  ~ "home",
-                                    name == "Zola" & weeksold >9 ~ "DPK",
+                                    (name == "Arthur" & weeksold <10) ~ "home",
+                                    (name == "Arthur" & weeksold ==10) ~ "DPK",
+                                    (name == "Arthur" & weeksold >10) ~ "DPK",
+                                    (name == "Aurora" & weeksold <10)  ~ "home",
+                                    (name == "Aurora" & weeksold ==10) ~ "DPK",
+                                    (name == "Aurora" & weeksold >10) ~ "DPK",
+                                    (name == "Westley" & weeksold <10) ~ "home",
+                                    (name == "Westley" & weeksold ==10) ~ "DPK",
+                                    (name == "Westley" & weeksold >10) ~ "DPK",
+                                    (name == "Wisdom" & weeksold <10)  ~ "home",
+                                    (name == "Wisdom" & weeksold ==10) ~ "DPK",
+                                    (name == "Wisdom" & weeksold >10) ~ "DPK",
+                                    (name == "Yonder" & weeksold <10)  ~ "home",
+                                    (name == "Yonder" & weeksold ==10) ~ "DPK",
+                                    (name == "Yonder" & weeksold >10) ~ "DPK",
+                                    (name == "Zindel" & weeksold <10)  ~ "home",
+                                    (name == "Zindel" & weeksold ==10) ~ "DPK",
+                                    (name == "Zindel" & weeksold >10) ~ "DPK",
+                                    (name == "Zola" & weeksold <10)  ~ "home",
+                                    (name == "Zola" & weeksold ==10) ~ "DPK",
+                                    (name == "Aurora" & weeksold >10) ~ "DPK",
                                     name == "Kristoff" ~ "home",
                                     name == "Barley" ~ "home",
                                     name == "Rainbow" ~ "home",
@@ -530,20 +554,27 @@ sleepbout_weeklyavg_bypuppy2<-sleepbout_weeklyavg_bypuppy2 %>% mutate(rearing =
                                     name == "Yolanda" ~ "DPK",
                                     name == "Zina" ~ "DPK",
                                     name == "Zax" ~ "DPK",
-                                    name == "Arthur" & weeksold <10 ~ "home",
-                                    name == "Arthur" & weeksold >9 ~ "DPK",
-                                    name == "Aurora" & weeksold <10  ~ "home",
-                                    name == "Aurora" & weeksold >9 ~ "DPK",
-                                    name == "Westley" & weeksold <10 ~ "home",
-                                    name == "Westley" & weeksold >9 ~ "DPK",
-                                    name == "Wisdom" & weeksold <10  ~ "home",
-                                    name == "Wisdom" & weeksold >9 ~ "DPK",
-                                    name == "Yonder" & weeksold <10 ~ "home",
-                                    name == "Yonder" & weeksold >9 ~ "DPK",
-                                    name == "Zindel" & weeksold < 10  ~ "home",
-                                    name == "Zindel" & weeksold >9 ~ "DPK",
-                                    name == "Zola" & weeksold <10  ~ "home",
-                                    name == "Zola" & weeksold >9 ~ "DPK",
+                                    (name == "Arthur" & weeksold <10) ~ "home",
+                                    (name == "Arthur" & weeksold ==10) ~ "DPK",
+                                    (name == "Arthur" & weeksold >10) ~ "DPK",
+                                    (name == "Aurora" & weeksold <10)  ~ "home",
+                                    (name == "Aurora" & weeksold ==10) ~ "DPK",
+                                    (name == "Aurora" & weeksold >10) ~ "DPK",
+                                    (name == "Westley" & weeksold <10) ~ "home",
+                                    (name == "Westley" & weeksold ==10) ~ "DPK",
+                                    (name == "Westley" & weeksold >10) ~ "DPK",
+                                    (name == "Wisdom" & weeksold <10)  ~ "home",
+                                    (name == "Wisdom" & weeksold ==10) ~ "DPK",
+                                    (name == "Wisdom" & weeksold >10) ~ "DPK",
+                                    (name == "Yonder" & weeksold <10)  ~ "home",
+                                    (name == "Yonder" & weeksold ==10) ~ "DPK",
+                                    (name == "Yonder" & weeksold >10) ~ "DPK",
+                                    (name == "Zindel" & weeksold <10)  ~ "home",
+                                    (name == "Zindel" & weeksold ==10) ~ "DPK",
+                                    (name == "Zindel" & weeksold >10) ~ "DPK",
+                                    (name == "Zola" & weeksold <10)  ~ "home",
+                                    (name == "Zola" & weeksold ==10) ~ "DPK",
+                                    (name == "Aurora" & weeksold >10) ~ "DPK",
                                     name == "Kristoff" ~ "home",
                                     name == "Barley" ~ "home",
                                     name == "Rainbow" ~ "home",
@@ -576,13 +607,127 @@ sleepbout_weeklyavg_bypuppy2<-sleepbout_weeklyavg_bypuppy2 %>% mutate(rearing =
                                     name == "Lily" ~ "F",
                                     name == "Leo" ~ "M",
                                     name == "Jack" ~ "M"))
-sleepbout_weeklyavg_bypuppy$weeksold<-as.numeric(as.character(sleepbout_weeklyavg_bypuppy$weeksold))
+sleepbout_weeklyavg_bypuppy2$weeksold<-as.numeric(as.character(sleepbout_weeklyavg_bypuppy2$weeksold))
+
+#Compare home vs. DPK pups
+sleepbout_weeklyavg_rearing2 <- sleepbout_weeklyavg_bypuppy2 %>% group_by(weeksold,state,rearing) %>% summarize(Mean_mins=mean(Mean_mins), N=n(),Total_mins=sum(Total_mins)) 
+sleepbout_weeklyavg_rearing$weeksold<-as.numeric(as.character(sleepbout_weeklyavg_rearing2$weeksold))
+```
+
+
+Threshold = 200, without collapsing across days
+---
+```{r}
+#threshold = 200
+sleepbouts_200_full<-intervaldf2 %>% mutate(state=case_when(interval_avg_activity >= 200 ~ "awake",interval_avg_activity <200 ~ "rest"))
+sleepbouts_200_full <-sleepbouts_200_full %>% mutate(intervaltime2=as.POSIXct(intervaltime, format="%H:%M"))
+sleepbouts_200_full <-sleepbouts_200_full %>% mutate(intervalend=(intervaltime2+(5*60)))
+sleepbouts_200_full <-sleepbouts_200_full %>% mutate(intervalend=strftime(intervalend, format="%H:%M")) 
+sleepbouts_200_full <-sleepbouts_200_full %>% select(-intervaltime2)
+sleepbouts_200_full<-sleepbouts_200_full %>% 
+  mutate(timeperiod = hm(intervaltime),
+         timeperiod_end = hm(intervalend)) %>%
+  group_by(name,weeksold) %>% 
+  arrange(intervaltime) %>% 
+  mutate (group = data.table::rleid(state))
+
+#Intervals of resting and wakefulness for each **DAY**
+sleepbout_intervals_full_200<-sleepbouts_200_full %>% 
+  group_by(name,Date,weeksold,group) %>% 
+  summarise(intervaltime = paste(first(intervaltime), last(intervalend), sep = '-'), 
+            state = first(state), 
+            timeperiod = last(timeperiod_end) - first(timeperiod))
+
+library(lubridate)
+sleepbout_intervals_full_200<-sleepbout_intervals_full_200 %>% mutate(timeperiod_secs=time_length(timeperiod),
+                                     timeperiod_mins=timeperiod_secs/60) %>% select(-timeperiod_secs)
+
+#collapse to get average in each interval per week
+sleepbout_intervals_200_collapsed_bypuppy<-sleepbout_intervals_full_200 %>% group_by(weeksold,name,intervaltime,state) %>%summarise(interval_avg_activity=mean(timeperiod_mins))
+
+sleepbout_intervals_200_collapsed<-sleepbout_intervals_full_200 %>% group_by(weeksold,intervaltime,state) %>%summarise(interval_avg_activity=mean(timeperiod_mins))
+
+#here
+
+sleepbout_weeklyavg_full_200 <- sleepbout_intervals_200_collapsed %>% group_by(weeksold,state) %>%
+  summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))
+
+sleepbout_weeklyavg_bypuppy_full_200 <- sleepbout_intervals_200_collapsed %>% group_by(weeksold,name,state) %>% 
+  summarize(Mean_mins=mean(timeperiod_mins), N=n(),Total_mins=sum(timeperiod_mins))
+
+sleepbout_intervals_200_collapsed_bypuppy$weeksold<-as.character(sleepbout_intervals_200_collapsed_bypuppy$weeksold)
+sleepbout_intervals_200_collapsed_bypuppy<-sleepbout_intervals_200_collapsed_bypuppy %>% mutate(rearing =
+                          case_when(name == "Anya" ~ "DPK",
+                                    name == "Aries" ~ "DPK",
+                                    name == "Weston" ~ "DPK",
+                                    name == "Ying" ~ "DPK",
+                                    name == "Yolanda" ~ "DPK",
+                                    name == "Zina" ~ "DPK",
+                                    name == "Zax" ~ "DPK",
+                                    name == "Arthur" & weeksold <10 ~ "home",
+                                    name == "Arthur" & weeksold ==10 ~ "DPK",
+                                    name == "Arthur" & weeksold >10 ~ "DPK",
+                                    name == "Aurora" & weeksold <10  ~ "home",
+                                    name == "Aurora" & weeksold ==10 ~ "DPK",
+                                    name == "Aurora" & weeksold >10 ~ "DPK",
+                                    name == "Westley" & weeksold <10 ~ "home",
+                                    name == "Westley" & weeksold ==10 ~ "DPK",
+                                    name == "Westley" & weeksold >10 ~ "DPK",
+                                    name == "Wisdom" & weeksold <10  ~ "home",
+                                    name == "Wisdom" & weeksold ==10 ~ "DPK",
+                                    name == "Wisdom" & weeksold >10 ~ "DPK",
+                                    name == "Yonder" & weeksold <10  ~ "home",
+                                    name == "Yonder" & weeksold ==10 ~ "DPK",
+                                    name == "Yonder" & weeksold >10 ~ "DPK",
+                                    name == "Zindel" & weeksold <10  ~ "home",
+                                    name == "Zindel" & weeksold ==10 ~ "DPK",
+                                    name == "Zindel" & weeksold >10 ~ "DPK",
+                                    name == "Zola" & weeksold <10  ~ "home",
+                                    name == "Zola" & weeksold ==10 ~ "DPK",
+                                    name == "Aurora" & weeksold >10 ~ "DPK",
+                                    name == "Kristoff" ~ "home",
+                                    name == "Barley" ~ "home",
+                                    name == "Rainbow" ~ "home",
+                                    name == "Sassy" ~ "home",
+                                    name == "Sparky" ~ "home",
+                                    name == "Stanley" ~ "home",
+                                    name == "Lily" ~ "home",
+                                    name == "Leo" ~ "home",
+                                    name == "Jack" ~ "home"),
+                          sex=case_when(name == "Anya" ~ "F",
+                                    name == "Aries" ~ "M",
+                                    name == "Weston" ~ "M",
+                                    name == "Ying" ~ "M",
+                                    name == "Yolanda" ~ "F",
+                                    name == "Zina" ~ "F",
+                                    name == "Zax" ~ "M",
+                                    name == "Arthur" ~ "M",
+                                    name == "Aurora" ~ "F",
+                                    name == "Westley" ~ "M",
+                                    name == "Wisdom" ~ "F",
+                                    name == "Yonder" ~ "F",
+                                    name == "Zola" ~ "F",
+                                    name == "Zindel" ~ "M",
+                                    name == "Kristoff" ~ "M",
+                                    name == "Barley" ~ "M",
+                                    name == "Rainbow" ~ "F",
+                                    name == "Sassy" ~ "F",
+                                    name == "Sparky" ~ "M",
+                                    name == "Stanley" ~ "M",
+                                    name == "Lily" ~ "F",
+                                    name == "Leo" ~ "M",
+                                    name == "Jack" ~ "M"))
+sleepbout_intervals_200_collapsed_bypuppy$weeksold<-as.numeric(as.character(sleepbout_intervals_200_collapsed_bypuppy$weeksold))
+
+#Compare home vs. DPK pups
+sleepbout_weeklyavg_rearing_full_200 <- sleepbout_weeklyavg_bypuppy_full_200 %>% group_by(weeksold,state,rearing) %>% summarize(Mean_mins=mean(Mean_mins), N=n(),Total_mins=sum(Total_mins)) 
+sleepbout_weeklyavg_rearing_full_200$weeksold<-as.numeric(as.character(sleepbout_weeklyavg_rearing_full_200$weeksold))
 ```
 
 ---
 #PLOTTING REST/WAKE BOUTS
 ---
-
+  #FOR GROUP
 Compare average rest/wake bout durations in 1 individual week
 ```{r}
 ggplot(subset(sleepbout_weeklyavg,weeksold=="20"), aes(x=state, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle("Average Sleep/Awake Bout Duration: 20 weeks") + xlab("State")+ ylab("Mean State Duration (min)") + labs(colour = "State")
@@ -607,9 +752,37 @@ ggplot(subset(sleepbout_weeklyavg_rearing,state=="rest"), aes(x=weeksold, y=Mean
 ggplot(subset(sleepbout_weeklyavg_rearing,state=="rest"), aes(x=weeksold, y=Total_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle("Average Total Rest by Week: Home vs. DPK") + xlab("Weeks Old")+ ylab("Rest (mins)") + labs(colour = "Rearing") + scale_x_continuous(breaks=weeks)
 ```
 
+#FOR GROUP WITHOUT COLLAPSING FIRST,threshold = 100
+---
+Compare average rest/wake bout durations in 1 individual week
+```{r}
+ggplot(subset(sleepbout_weeklyavg2,weeksold=="20"), aes(x=state, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle("Average Sleep/Awake Bout Duration: 20 weeks") + xlab("State")+ ylab("Mean State Duration (min)") + labs(colour = "State")
+```
+Compare average rest/awake bout durations for each week
+```{r}
+sleepbout_weeklyavg2$weeksold<-as.factor(sleepbout_weeklyavg2$weeksold)
+ggplot(subset(sleepbout_weeklyavg2,state=="awake"), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle("Avg Duration of Awake Bouts by Week") + xlab("Weeks Old")+ ylab("Mean State Duration (min)") + labs(colour = "Age (weeks)")
+
+ggplot(subset(sleepbout_weeklyavg2,state=="rest"), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=weeksold)) + ggtitle("Avg Duration of Rest Bouts by Week") + xlab("Weeks Old")+ ylab("Mean State Duration (min)") + labs(colour = "Age (weeks)")
+
+```
+Total Minutes of Rest by Week
+```{r}
+ggplot(subset(sleepbout_weeklyavg2,state=="rest"), aes(x=weeksold, y=Total_mins))+ geom_col(aes(fill=weeksold)) + ggtitle("Average Total Rest by Week") + xlab("Weeks Old")+ ylab("Total Rest (min)") + labs(colour = "Age (weeks)")
+```
+AVG REST HOME VS. DPK 
+```{r}
+weeks<-c(8:20)
+
+ggplot(subset(sleepbout_weeklyavg_rearing2,state=="rest"), aes(x=weeksold, y=Mean_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle("Avg Duration of Rest Bouts by Week: Home vs. DPK") + xlab("Weeks Old")+ ylab("Avg State Duration (min)") + labs(colour = "Rearing") + scale_x_continuous(breaks=weeks)
+
+ggplot(subset(sleepbout_weeklyavg_rearing2,state=="rest"), aes(x=weeksold, y=Total_mins, colour=rearing, group=rearing)) + geom_point() + geom_line() + ggtitle("Average Total Rest by Week: Home vs. DPK") + xlab("Weeks Old")+ ylab("Rest (mins)") + labs(colour = "Rearing") + scale_x_continuous(breaks=weeks)
+```
 
 
-  #BY PUPPY
+
+
+#BY PUPPY
 ---
 Bar graph: Mean State Duration for 1 puppy by weeks
 ```{r}
@@ -623,6 +796,24 @@ Line graph: mean rest state duration by week for each puppy
 ```{r}
 ggplot(subset(sleepbout_weeklyavg_bypuppy, state=="rest"), aes(x=weeksold, y=Mean_mins, group=name))+ geom_line(aes(colour=name)) + ggtitle("Mean Rest State Duration by Week") + xlab("Weeks Old")+ ylab("Mean State Duration (min)") + labs(colour = "Age (weeks)")+ scale_x_continuous(breaks=weeks)
 ```
+
+
+#BY PUPPY WITHOUT COLLAPSING FIRST, threshold = 100
+---
+Bar graph: Mean State Duration for 1 puppy by weeks
+```{r}
+ggplot(subset(sleepbout_weeklyavg_bypuppy2, name=="Leo"), aes(x=weeksold, y=Mean_mins))+ geom_col(aes(fill=state)) + ggtitle("Leo: Mean Rest State Duration by Week") + xlab("Weeks Old")+ ylab("Mean State Duration (min)") + labs(colour = "Age (weeks)")+ scale_x_continuous(breaks=weeks)
+```
+Line graph: Mean State Duration for 1 puppy by weeks
+```{r}
+ggplot(subset(sleepbout_weeklyavg_bypuppy2, name=="Leo"), aes(x=weeksold, y=Mean_mins, group=state))+ geom_line(aes(colour=state)) + ggtitle("Leo: Mean Rest State Duration by Week") + xlab("Weeks Old")+ ylab("Mean State Duration (min)") + labs(colour = "Age (weeks)")+ scale_x_continuous(breaks=weeks)
+```
+Line graph: mean rest state duration by week for each puppy
+```{r}
+ggplot(subset(sleepbout_weeklyavg_bypuppy2, state=="rest"), aes(x=weeksold, y=Mean_mins, group=name))+ geom_line(aes(colour=name)) + ggtitle("Mean Rest State Duration by Week") + xlab("Weeks Old")+ ylab("Mean State Duration (min)") + labs(colour = "Age (weeks)")+ scale_x_continuous(breaks=weeks)
+```
+
+
 
 
 #EXPORT   
