@@ -1,0 +1,97 @@
+Activity Graphs
+================
+Morgan Ferrans
+10/28/2021
+
+``` r
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE)
+```
+
+``` r
+library(ggplot2)
+library(dplyr)
+load(file = "activitygraphsenv.RData")
+```
+
+| \#PLOTTING ACTIVITY Setup                                                                                                                                                                          |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Store weeks old as a factor                                                                                                                                                                        |
+| `r weeklyintervaldf$weeksold<-as.factor(weeklyintervaldf$weeksold) indiv_weekly_dev$weeksold<-as.factor(indiv_weekly_dev$weeksold)` List of desired hourly time breaks for graph x axis tick marks |
+| `r hours_list<-c("08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00")`                                                         |
+| \# MEAN ACTIVITY COUNT GRAPHS (raw mean activity, not deviance)                                                                                                                                    |
+
+#### INDIVIDUAL GRAPH OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL PUPPY FOR 1 INDIVIDUAL WEEK
+
+``` r
+#Arthur, 8 weeks
+#can add ylim(-500,2500)
+ggplot(subset(intervaldf,weeksold=="16" & name=="Stanley"), aes(x=intervaltime, y=interval_avg_activity, group=1)) + geom_line() + ggtitle("Stanley: 16 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") +
+  scale_x_discrete(breaks=hours_list)
+```
+
+![](activitycountgraphs_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+#### GRAPH OF RAW (MEAN) ACTIVITY COUNTS GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK
+
+``` r
+ggplot(subset(intervaldf,weeksold=="8"), aes(x=intervaltime, y=interval_avg_activity, group='name')) + geom_line(aes(colour=name)) + ggtitle("Group Activity Counts: 8 weeks") + xlab("Time")+ ylab("Mean Activity Counts") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
+```
+
+![](activitycountgraphs_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+ggplot(subset(intervaldf,weeksold=="18"), aes(x=intervaltime, y=interval_avg_activity, group='name')) + geom_line(aes(colour=name)) + ggtitle("Group Activity Counts: 18 weeks") + xlab("Time")+ ylab("Mean Activity Counts") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
+```
+
+![](activitycountgraphs_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
+
+#### COMPARE TWO PUPPIES’ RAW MEAN ACTIVITY COUNTS FOR 1 SPECIFIC WEEK
+
+``` r
+###graph is now fixed!
+ggplot(subset(intervaldf,name=="Sassy"&weeksold==8|name=="Arthur"&weeksold==8), aes(x=intervaltime, y=interval_avg_activity, group=name)) + geom_line(aes(colour=name)) + ggtitle("Mean Activity Counts: 8 weeks") + xlab("Time")+ ylab("Mean Activity Counts") + labs(colour = "Puppy") + scale_x_discrete(breaks=hours_list)
+```
+
+![](activitycountgraphs_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+#### GROUP AVG OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL WEEK
+
+``` r
+#8 weeks
+ggplot(subset(weeklyintervaldf,weeksold=="8"), aes(x=intervaltime, y=interval_weekly_avg, group=1)) + geom_line() + ggtitle("Group: 8 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+```
+
+![](activitycountgraphs_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+``` r
+#20 weeks
+ggplot(subset(weeklyintervaldf,weeksold=="20"), aes(x=intervaltime, y=interval_weekly_avg, group=1)) + geom_line() + ggtitle("Group: 20 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+```
+
+![](activitycountgraphs_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+#### GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP RAW MEAN ACTIVITY COUNTS)
+
+``` r
+ggplot(weeklyintervaldf, aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Group: 8-20 weeks") + xlab("Time")+ ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+```
+
+![](activitycountgraphs_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+#### GRAPHS OF GROUP: 8 VS 20 WEEKS (RAW MEAN ACTIVITY COUNTS)
+
+``` r
+ggplot((subset(weeklyintervaldf,weeksold=="8" | weeksold=="20")), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Group: 8 vs. 20 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+```
+
+![](activitycountgraphs_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+#### GRAPHS OF GROUP: 8, 14, & 20 WEEKS
+
+``` r
+ggplot((subset(weeklyintervaldf,weeksold=="8" | weeksold=="14"| weeksold=="20")), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle("Group: 8, 14, & 20 weeks") + xlab("Time") + ylab("Mean Activity Counts") + labs(colour = "Age (weeks)") + scale_x_discrete(breaks=hours_list)
+```
+
+![](activitycountgraphs_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->

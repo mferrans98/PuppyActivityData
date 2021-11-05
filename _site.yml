@@ -7,7 +7,9 @@ navbar:
     - text: "Full Code"
       href: code.html
     - text: "Activity Graphs"
-      href: activitygraphs.html
+      href: activitycountgraphs.html
+    - text: "Mean Deviance Activity Graphs"
+      href: meandeviancegraphs.html
     - text: "Sleep"
       href: sleepdata.html
 output_dir: "docs"

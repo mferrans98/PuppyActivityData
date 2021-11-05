@@ -4,7 +4,7 @@ output:
 ---
 ACTIVITY MONITOR DATA (Updated 20211026)
 ```{r}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
 ```
 
 #DATA SETUP
@@ -18,19 +18,18 @@ library(clock)
 library(lubridate)
 library(hms)
 setwd('~/Desktop')
+load(file = "activitygraphsenv.RData")
+```
 
-
+```{r, eval=FALSE}
 ##IMPORT the data
 sheets <- readxl::excel_sheets('puppies2.xlsx')
 activity_df <- do.call(rbind, lapply(sheets, function(X) transform(readxl::read_excel('puppies2.xlsx', sheet = X), sheetname = X)))
 activity_df<-activity_df %>% mutate(time=as_hms(activity_df$Time)) %>% na.omit() %>%  select(-sheetname,-Time)
 activity_df$Date <- as.Date(activity_df$Date, format= "%Y-%m-%d")
-
-
-
 ```
 Removing dates where collar is off
-```{r}
+```{r, eval=FALSE}
 #removing dates where collar is off
   #Anya
 filtered_dates <- activity_df[!(activity_df$Dog.name == "Anya" & activity_df$Date < "2019-10-02")&!(activity_df$Dog.name == "Anya" & activity_df$Date == "2019-10-16")&!(activity_df$Dog.name == "Anya" & activity_df$Date > "2020-11-18"),]

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Morgan Ferrans" />
+
+<meta name="date" content="2021-10-28" />
+
+<title>Activity Graphs</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Puppy Activity Data</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="code.html">Full Code</a>
+</li>
+<li>
+  <a href="activitycountgraphs.html">Activity Graphs</a>
+</li>
+<li>
+  <a href="meandeviancegraphs.html">Mean Deviance Activity Graphs</a>
+</li>
+<li>
+  <a href="sleepdata.html">Sleep</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Activity Graphs</h1>
+<h4 class="author">Morgan Ferrans</h4>
+<h4 class="date">10/28/2021</h4>
+
+</div>
+
+
+<pre class="r"><code>knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE,
+                      message = FALSE)</code></pre>
+<pre class="r"><code>library(ggplot2)
+library(dplyr)
+load(file = &quot;activitygraphsenv.RData&quot;)</code></pre>
+<table style="width:6%;">
+<colgroup>
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>#PLOTTING ACTIVITY Setup</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Store weeks old as a factor</td>
+</tr>
+<tr class="even">
+<td><code>r weeklyintervaldf$weeksold&lt;-as.factor(weeklyintervaldf$weeksold) indiv_weekly_dev$weeksold&lt;-as.factor(indiv_weekly_dev$weeksold)</code> List of desired hourly time breaks for graph x axis tick marks</td>
+</tr>
+<tr class="odd">
+<td><code>r hours_list&lt;-c("08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00")</code></td>
+</tr>
+<tr class="even">
+<td># MEAN ACTIVITY COUNT GRAPHS (raw mean activity, not deviance)</td>
+</tr>
+</tbody>
+</table>
+<div id="individual-graph-of-raw-mean-activity-counts-for-1-individual-puppy-for-1-individual-week" class="section level4">
+<h4>INDIVIDUAL GRAPH OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL PUPPY FOR 1 INDIVIDUAL WEEK</h4>
+<pre class="r"><code>#Arthur, 8 weeks
+#can add ylim(-500,2500)
+ggplot(subset(intervaldf,weeksold==&quot;16&quot; &amp; name==&quot;Stanley&quot;), aes(x=intervaltime, y=interval_avg_activity, group=1)) + geom_line() + ggtitle(&quot;Stanley: 16 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) +
+  scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="activitycountgraphs_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="graph-of-raw-mean-activity-counts-grouped-by-puppy-for-1-specific-week" class="section level4">
+<h4>GRAPH OF RAW (MEAN) ACTIVITY COUNTS GROUPED BY PUPPY) FOR 1 SPECIFIC WEEK</h4>
+<pre class="r"><code>ggplot(subset(intervaldf,weeksold==&quot;8&quot;), aes(x=intervaltime, y=interval_avg_activity, group=&#39;name&#39;)) + geom_line(aes(colour=name)) + ggtitle(&quot;Group Activity Counts: 8 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="activitycountgraphs_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(subset(intervaldf,weeksold==&quot;18&quot;), aes(x=intervaltime, y=interval_avg_activity, group=&#39;name&#39;)) + geom_line(aes(colour=name)) + ggtitle(&quot;Group Activity Counts: 18 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="activitycountgraphs_files/figure-html/unnamed-chunk-5-2.png" width="672" /></p>
+</div>
+<div id="compare-two-puppies-raw-mean-activity-counts-for-1-specific-week" class="section level4">
+<h4>COMPARE TWO PUPPIES’ RAW MEAN ACTIVITY COUNTS FOR 1 SPECIFIC WEEK</h4>
+<pre class="r"><code>###graph is now fixed!
+ggplot(subset(intervaldf,name==&quot;Sassy&quot;&amp;weeksold==8|name==&quot;Arthur&quot;&amp;weeksold==8), aes(x=intervaltime, y=interval_avg_activity, group=name)) + geom_line(aes(colour=name)) + ggtitle(&quot;Mean Activity Counts: 8 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Puppy&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="activitycountgraphs_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="group-avg-of-raw-mean-activity-counts-for-1-individual-week" class="section level4">
+<h4>GROUP AVG OF RAW (MEAN) ACTIVITY COUNTS FOR 1 INDIVIDUAL WEEK</h4>
+<pre class="r"><code>#8 weeks
+ggplot(subset(weeklyintervaldf,weeksold==&quot;8&quot;), aes(x=intervaltime, y=interval_weekly_avg, group=1)) + geom_line() + ggtitle(&quot;Group: 8 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="activitycountgraphs_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>#20 weeks
+ggplot(subset(weeklyintervaldf,weeksold==&quot;20&quot;), aes(x=intervaltime, y=interval_weekly_avg, group=1)) + geom_line() + ggtitle(&quot;Group: 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="activitycountgraphs_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+</div>
+<div id="graphs-of-all-weeks-overlaid-using-entire-group-raw-mean-activity-counts" class="section level4">
+<h4>GRAPHS OF ALL WEEKS OVERLAID (USING ENTIRE GROUP RAW MEAN ACTIVITY COUNTS)</h4>
+<pre class="r"><code>ggplot(weeklyintervaldf, aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8-20 weeks&quot;) + xlab(&quot;Time&quot;)+ ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="activitycountgraphs_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>
+<div id="graphs-of-group-8-vs-20-weeks-raw-mean-activity-counts" class="section level4">
+<h4>GRAPHS OF GROUP: 8 VS 20 WEEKS (RAW MEAN ACTIVITY COUNTS)</h4>
+<pre class="r"><code>ggplot((subset(weeklyintervaldf,weeksold==&quot;8&quot; | weeksold==&quot;20&quot;)), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8 vs. 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="activitycountgraphs_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="graphs-of-group-8-14-20-weeks" class="section level4">
+<h4>GRAPHS OF GROUP: 8, 14, &amp; 20 WEEKS</h4>
+<pre class="r"><code>ggplot((subset(weeklyintervaldf,weeksold==&quot;8&quot; | weeksold==&quot;14&quot;| weeksold==&quot;20&quot;)), aes(x=intervaltime, y=interval_weekly_avg, group=weeksold)) + geom_line(aes(colour=weeksold)) + ggtitle(&quot;Group: 8, 14, &amp; 20 weeks&quot;) + xlab(&quot;Time&quot;) + ylab(&quot;Mean Activity Counts&quot;) + labs(colour = &quot;Age (weeks)&quot;) + scale_x_discrete(breaks=hours_list)</code></pre>
+<p><img src="activitycountgraphs_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
